@@ -1,13 +1,16 @@
 # Gepetto
 
-AI-powered natural language testing framework that allows anyone to write and run software tests using plain English.
+AI-powered natural language task execution framework that allows anyone to write and run tasks using plain English. The
+primary use case is running browser test cases, but it could be used for any other task automation needs.
 
-## Project Status
+## Features
 
 This is a minimal implementation of Gepetto that supports:
-- Basic configuration (target hostname)
-- Running a test described in natural language
-- Capturing test results
+- Basic configuration
+- Running a task described in natural language
+- Capturing task results in JUnit XML
+- Support all LLM supported by Spring AI (gpt, claude, ollama, etc..)
+- Supports MCP to connect to third party actions 
 
 ## Installation
 
