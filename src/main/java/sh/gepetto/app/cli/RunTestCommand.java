@@ -1,5 +1,6 @@
 package sh.gepetto.app.cli;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import sh.gepetto.app.model.Configuration;
 import sh.gepetto.app.model.QATest;
 import sh.gepetto.app.model.TestResult;
+import sh.gepetto.app.service.JUnitReportService;
 import sh.gepetto.app.service.TestExecutionService;
 import sh.gepetto.app.service.TestParser;
 import picocli.CommandLine.Command;
@@ -35,6 +37,7 @@ public class RunTestCommand implements Runnable {
     private final TestParser testParser;
     private final TestExecutionService testExecutionService;
     private final ApplicationConfig appConfig;
+    private final JUnitReportService reportService;
     
     @Option(names = {"--var", "-v"}, description = "Define a variable in format NAME=VALUE (overrides configured variables)", split = ",")
     private java.util.Map<String, String> variables;
@@ -42,13 +45,21 @@ public class RunTestCommand implements Runnable {
     @Option(names = {"--debug", "-d"}, description = "Enable debug mode for this run")
     private boolean debug;
     
+    @Option(names = {"--no-report"}, description = "Disable saving test reports")
+    private boolean noReport;
+    
     @picocli.CommandLine.Parameters(index = "0", description = "Path to the task file to run (.test or .gpt)")
     private String taskFilePath;
     
-    public RunTestCommand(TestParser testParser, TestExecutionService testExecutionService, ApplicationConfig appConfig) {
+    public RunTestCommand(
+            TestParser testParser, 
+            TestExecutionService testExecutionService, 
+            ApplicationConfig appConfig,
+            JUnitReportService reportService) {
         this.testParser = testParser;
         this.testExecutionService = testExecutionService;
         this.appConfig = appConfig;
+        this.reportService = reportService;
     }
     
     @Override
@@ -100,6 +111,17 @@ public class RunTestCommand implements Runnable {
 
             // Print result
             System.out.println(formatTaskResult(result));
+            
+            // Save reports unless disabled
+            if (!noReport) {
+                try {
+                    Path reportPath = reportService.saveReport(result);
+                    System.out.println("Test report saved to: " + reportPath);
+                } catch (IOException e) {
+                    logger.error("Failed to save test report: {}", e.getMessage(), e);
+                    System.out.println("Warning: Failed to save test report: " + e.getMessage());
+                }
+            }
         } catch (Exception e) {
             logger.error("Error running task: {}", e.getMessage(), e);
             System.out.println("Error: " + e.getMessage());
