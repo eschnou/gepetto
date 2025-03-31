@@ -32,29 +32,52 @@ sudo ./install.sh
 # Initialize a new project
 gepetto init
 
-# Configure settings
-gepetto configure --hostname example.com
-gepetto configure --debug
-
-# Run a test file
-gepetto run path/to/test.test
+# Run a task file
+gepetto run gepetto/tasks/login.gpt
 ```
 
-## Test File Format
+## Task File Format
 
 ```
-# Test Name
-description: "Description of the test"
+# Task Name
+description: "Description of the task"
 tags: [tag1, tag2, tag3]
 author: "Author Name"
 created: "2025-03-15"
 
 Test:
-  Visit the login page.
-  Enter username and password.
-  Click login button.
-  Verify user is logged in.
+  Visit the login page at ${HOSTNAME}.
+  Login with username ${USERNAME} and password ${PASSWORD}.
+  Verify user is logged in and on the main dashboard.
+  Click the logout button.
+  Verify you are back to the login page.
 ```
+
+## Variables
+
+Gepetto supports variables in task files using the `${VARIABLE}` syntax. Variables allow your 
+tasks to be reusable across different environments and scenarios.
+
+### Variable Sources
+
+Variables can be defined from two sources:
+
+1. **Configuration file** - Stored in `gepetto/config.yaml`:
+   ```yaml
+   variables:
+     HOSTNAME: "example.com"
+     USERNAME: "testuser"
+   ```
+
+2. **Command line arguments** - Using the `--var` or `-v` flag:
+   ```bash
+   gepetto run task.gpt --var PASSWORD=secret123
+   ```
+
+### Precedence
+
+When the same variable is defined in multiple places, command line arguments take precedence 
+over the configuration file.
 
 ## Clearing the cache
 
@@ -79,17 +102,26 @@ sessions if you'd like to clear the offline state.
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
 
-## Project Structure
+# License
 
-- `config/` - Application configuration
-- `model/` - Domain model classes
-- `service/` - Business logic services
-- `cli/` - Command-line interface components
+MIT License
 
-## Next Steps
+Copyright (c) 2024-2025 Laurent Eschenauer
 
-Future development will include:
-- Implementing the actual test execution logic
-- Adding test file loading and storage
-- Creating a test management system
-- Implementing reporting features
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
