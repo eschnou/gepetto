@@ -20,12 +20,12 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 /**
- * Command for running tests
+ * Command for running tasks
  */
 @Component
 @Command(
     name = "run", 
-    description = "Run a test file"
+    description = "Run a task file"
 )
 public class RunTestCommand implements Runnable {
 
@@ -36,14 +36,14 @@ public class RunTestCommand implements Runnable {
     private final TestExecutionService testExecutionService;
     private final ApplicationConfig appConfig;
     
-    @Option(names = {"--hostname", "-h"}, required = false, description = "Target hostname to test (overrides configured hostname)")
-    private String hostname;
+    @Option(names = {"--var", "-v"}, description = "Define a variable in format NAME=VALUE (overrides configured variables)", split = ",")
+    private java.util.Map<String, String> variables;
     
     @Option(names = {"--debug", "-d"}, description = "Enable debug mode for this run")
     private boolean debug;
     
-    @picocli.CommandLine.Parameters(index = "0", description = "Path to the test file to run")
-    private String testFilePath;
+    @picocli.CommandLine.Parameters(index = "0", description = "Path to the task file to run (.test or .gpt)")
+    private String taskFilePath;
     
     public RunTestCommand(TestParser testParser, TestExecutionService testExecutionService, ApplicationConfig appConfig) {
         this.testParser = testParser;
@@ -60,48 +60,56 @@ public class RunTestCommand implements Runnable {
                 logger.info("Debug mode enabled for this run");
             }
             
-            // Determine hostname to use
-            String targetHostname = hostname;
-            if (targetHostname == null) {
-                targetHostname = appConfig.getTargetHostname();
-                if (targetHostname == null) {
-                    System.out.println("Error: No target hostname provided and none configured.");
-                    System.out.println("Please either:");
-                    System.out.println("1. Specify a hostname with --hostname or -h");
-                    System.out.println("2. Configure a default hostname with 'gepetto configure --hostname <hostname>'");
-                    return;
-                }
-                logger.info("Using configured hostname: {}", targetHostname);
+            // Create configuration with variables
+            Configuration config = Configuration.builder()
+                .variables(new java.util.HashMap<>())
+                .build();
+                
+            // Add configured variables if available
+            if (appConfig.getVariables() != null) {
+                config.getVariables().putAll(appConfig.getVariables());
+            }
+                
+            // Add command line variables (override configured ones)
+            if (variables != null && !variables.isEmpty()) {
+                config.getVariables().putAll(variables);
+                logger.info("Added command line variables: {}", variables);
             }
             
-            // Create configuration
-            Configuration config = Configuration.builder().targetHostname(targetHostname).build();
+            // Log the variables that will be used
+            logger.info("Using variables: {}", config.getVariables());
 
-            // Parse test file
-            Path path = Paths.get(testFilePath);
+            // Parse task file
+            Path path = Paths.get(taskFilePath);
             if (!Files.exists(path)) {
-                System.out.println("Error: Test file not found: " + testFilePath);
+                System.out.println("Error: Task file not found: " + taskFilePath);
+                return;
+            }
+            
+            // Validate file extension
+            if (!testParser.isValidTestFile(path)) {
+                System.out.println("Error: Invalid file type. File must have .test or .gpt extension: " + taskFilePath);
                 return;
             }
 
-            QATest test = testParser.parseTestFile(path);
-            logger.info("Parsed test: {}", test);
+            QATest task = testParser.parseTestFile(path);
+            logger.info("Parsed task: {}", task);
 
-            // Execute test
-            TestResult result = testExecutionService.executeTest(config, test);
+            // Execute task
+            TestResult result = testExecutionService.executeTest(config, task);
 
             // Print result
-            System.out.println(formatTestResult(result));
+            System.out.println(formatTaskResult(result));
         } catch (Exception e) {
-            logger.error("Error running test: {}", e.getMessage(), e);
+            logger.error("Error running task: {}", e.getMessage(), e);
             System.out.println("Error: " + e.getMessage());
         }
     }
     
-    private String formatTestResult(TestResult result) {
+    private String formatTaskResult(TestResult result) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n===== TEST RESULT =====\n");
-        sb.append("Test: ").append(result.getTest().getName()).append("\n");
+        sb.append("\n===== TASK RESULT =====\n");
+        sb.append("Task: ").append(result.getTest().getName()).append("\n");
         sb.append("Description: ").append(result.getTest().getDescription()).append("\n");
         sb.append("Status: ").append(result.getStatus()).append("\n");
         sb.append("Execution Time: ").append(result.getExecutionTime().format(DATE_FORMATTER)).append("\n");

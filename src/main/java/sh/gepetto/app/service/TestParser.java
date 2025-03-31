@@ -37,6 +37,7 @@ public class TestParser {
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
             boolean inTestSection = false;
+            boolean inTaskSection = false;
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -63,13 +64,16 @@ public class TestParser {
                     test.setCreated(LocalDate.parse(dateStr, DATE_FORMATTER).atStartOfDay());
                 }
 
-                // Parse test steps
+                // Parse test/task steps
                 if (line.equals("Test:")) {
                     inTestSection = true;
                     continue;
+                } else if (line.equals("Task:")) {
+                    inTaskSection = true;
+                    continue;
                 }
 
-                if (inTestSection) {
+                if (inTestSection || inTaskSection) {
                     test.addStep(line);
                 }
             }
@@ -80,11 +84,24 @@ public class TestParser {
             String fileName = filePath.getFileName().toString();
             if (fileName.endsWith(".test")) {
                 fileName = fileName.substring(0, fileName.length() - 5);
+            } else if (fileName.endsWith(".gpt")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
             }
             test.setName(fileName.replace("-", " "));
         }
 
         return test;
+    }
+
+    /**
+     * Check if a file is a valid test or task file
+     * 
+     * @param filePath the path to the file
+     * @return true if the file has a valid extension (.test or .gpt)
+     */
+    public boolean isValidTestFile(Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        return fileName.endsWith(".test") || fileName.endsWith(".gpt");
     }
 
     /**

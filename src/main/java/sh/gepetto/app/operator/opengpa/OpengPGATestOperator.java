@@ -56,7 +56,12 @@ public class OpengPGATestOperator implements TestOperator {
     public TestRun plan(QATest test) {
         Map<String, String> testContext = new HashMap<>();
         testContext.put("test", test.getName());
-        testContext.put("hostname", applicationConfig.getTargetHostname());
+        
+        // Add hostname if defined
+        String hostname = applicationConfig.getVariable("HOSTNAME");
+        if (hostname != null) {
+            testContext.put("hostname", hostname);
+        }
 
         ReActAgent agent = new ReActAgent(chatModel, workspace, actions, test.getDescription(), testContext);
         if (StringUtils.hasText(applicationConfig.getConfiguration().getLogPath())) {

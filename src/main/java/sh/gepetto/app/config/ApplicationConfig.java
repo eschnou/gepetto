@@ -38,19 +38,32 @@ public class ApplicationConfig {
         }
     }
 
-    public String getTargetHostname() {
-        return configuration.getTargetHostname();
+    public String getVariable(String name) {
+        if (configuration.getVariables() == null) {
+            return null;
+        }
+        return configuration.getVariables().get(name);
     }
 
-    public void setTargetHostname(String targetHostname) {
-        configuration.setTargetHostname(targetHostname);
+    public void setVariable(String name, String value) {
+        if (configuration.getVariables() == null) {
+            configuration.setVariables(new java.util.HashMap<>());
+        }
+        configuration.getVariables().put(name, value);
         // Save configuration to file whenever it changes
         boolean saved = configurationService.saveConfiguration(configuration);
         if (saved) {
-            logger.info("Configuration saved successfully");
+            logger.info("Variable '{}' set to '{}' and configuration saved successfully", name, value);
         } else {
-            logger.warn("Failed to save configuration");
+            logger.warn("Failed to save configuration after setting variable '{}'", name);
         }
+    }
+    
+    public java.util.Map<String, String> getVariables() {
+        if (configuration.getVariables() == null) {
+            configuration.setVariables(new java.util.HashMap<>());
+        }
+        return configuration.getVariables();
     }
 
     public Configuration getConfiguration() {

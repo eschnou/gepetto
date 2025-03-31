@@ -29,17 +29,17 @@
 # Disable debug mode
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="configure --no-debug"
 
-# Run a test file (using configured hostname)
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run path/to/test.test"
+# Run a task file (using configured hostname)
+./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt"
 
-# Run a test file (with explicit hostname)
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run path/to/test.test --hostname example.com"
+# Run a task file (with explicit hostname)
+./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt --hostname example.com"
 
-# Run a test file with debug output
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run path/to/test.test --debug"
+# Run a task file with debug output
+./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt --debug"
 
 # Run from JAR (after building)
-java -jar target/gepetto-0.0.1-SNAPSHOT.jar run path/to/test.test
+java -jar target/gepetto-0.0.1-SNAPSHOT.jar run gepetto/tasks/login.gpt
 
 # Run all Java tests
 ./mvnw test
@@ -56,15 +56,25 @@ java -jar target/gepetto-0.0.1-SNAPSHOT.jar run path/to/test.test
 - **Dependency injection**: Use Spring's constructor injection
 - **Documentation**: Maintain Javadoc for classes and public methods
 
-## Test File Format
+## Project Structure
+After initialization, a Gepetto project will have the following structure:
 ```
-# Test Name
-description: "Brief description of test purpose"
+gepetto/
+  ├── config.yaml      # Configuration
+  ├── tasks/           # Generic automation tasks
+  │   ├── login.gpt    # Example task file 
+  └── results/         # Execution results
+```
+
+## Task File Format
+```
+# Task Name
+description: "Brief description of task purpose"
 tags: [tag1, tag2]
 author: "Author Name"
 created: "YYYY-MM-DD"
 
-Test:
+Task:
   Step 1 in natural language.
   Step 2 in natural language.
   ...
@@ -72,4 +82,4 @@ Test:
 ```
 
 ## Product Overview
-Gepetto enables natural language test creation without programming knowledge. The app parses plain English test instructions, executes them automatically, and generates user-friendly reports. Focus on maintaining the core components: test parsing, execution service, and CLI commands.
+Gepetto enables natural language task automation without programming knowledge. The app parses plain English task instructions, executes them automatically, and generates user-friendly reports. Focus on maintaining the core components: task parsing, execution service, and CLI commands.

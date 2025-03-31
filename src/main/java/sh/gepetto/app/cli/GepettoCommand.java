@@ -12,7 +12,7 @@ import picocli.CommandLine.Command;
     name = "gepetto", 
     description = "AI-powered natural language testing framework",
     mixinStandardHelpOptions = true,
-    subcommands = {ConfigureCommand.class, RunTestCommand.class, InitCommand.class, HelpCommand.class, VersionCommand.class}
+    subcommands = {RunTestCommand.class, InitCommand.class, HelpCommand.class, VersionCommand.class}
 )
 public class GepettoCommand implements Runnable {
     

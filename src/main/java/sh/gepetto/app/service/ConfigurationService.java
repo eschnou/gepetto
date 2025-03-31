@@ -17,12 +17,13 @@ import java.nio.file.Paths;
  */
 @Service
 public class ConfigurationService {
+
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
-    private static final String CONFIG_DIR = ".gepetto";
+    private static final String PROJECT_DIR = "gepetto";
     private static final String CONFIG_FILE = "config.yaml";
 
     private final ObjectMapper yamlMapper;
-    private final Path configFilePath;
+    private Path configFilePath;
 
     public ConfigurationService() {
         this.yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -35,7 +36,13 @@ public class ConfigurationService {
      * @return true if configuration file exists, false otherwise
      */
     public boolean configurationExists() {
-        return Files.exists(configFilePath);
+        Path configPath = Paths.get(PROJECT_DIR, CONFIG_FILE);
+        if (Files.exists(configPath)) {
+            configFilePath = configPath;
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -77,10 +84,10 @@ public class ConfigurationService {
     }
 
     /**
-     * Get the configuration file path in the current directory
+     * Get the configuration file path
      */
     private Path getConfigFilePath() {
-        return Paths.get(CONFIG_DIR, CONFIG_FILE);
+        return Paths.get(PROJECT_DIR, CONFIG_FILE);
     }
 
     /**

@@ -26,14 +26,17 @@ import java.time.format.DateTimeFormatter;
 public class InitCommand implements Runnable {
     
     private static final Logger logger = LoggerFactory.getLogger(InitCommand.class);
-    private static final String TEST_DIR = "qa-tests";
-    private static final String SAMPLE_TEST_FILENAME = "navigation-test.test";
+    private static final String PROJECT_DIR = "gepetto";
+    private static final String TASKS_DIR = "tasks";
+    private static final String RESULTS_DIR = "results";
+    private static final String CONFIG_FILENAME = "config.yaml";
+    private static final String SAMPLE_TASK_FILENAME = "login.gpt";
     
     private final ApplicationConfig appConfig;
     private final ConfigurationService configService;
     
-    @Option(names = {"--hostname", "-h"}, description = "Target hostname to test", interactive = true)
-    private String hostname;
+    @Option(names = {"--var", "-v"}, description = "Define a variable in format NAME=VALUE", split = ",")
+    private java.util.Map<String, String> variables;
     
     public InitCommand(ApplicationConfig appConfig, ConfigurationService configService) {
         this.appConfig = appConfig;
@@ -43,70 +46,97 @@ public class InitCommand implements Runnable {
     @Override
     public void run() {
         // Check if already initialized
-        if (configService.configurationExists()) {
-            System.out.println("Project already initialized. Configuration exists at .gepetto/config.yaml");
+        Path projectDir = Paths.get(PROJECT_DIR);
+        if (Files.exists(projectDir)) {
+            System.out.println("Project already initialized. Directory exists at " + PROJECT_DIR);
             System.out.println("Use 'configure' command to update existing configuration.");
             return;
         }
         
-        // If hostname not provided, prompt for it manually
-        if (hostname == null || hostname.isEmpty()) {
-            System.out.print("Enter target hostname (e.g., example.com): ");
-            try {
-                java.util.Scanner scanner = new java.util.Scanner(System.in);
-                if (scanner.hasNextLine()) {
-                    hostname = scanner.nextLine().trim();
-                }
-            } catch (Exception e) {
-                logger.error("Error reading user input: {}", e.getMessage(), e);
-            }
-        }
-        
-        // Validate hostname and proceed
-        if (hostname != null && !hostname.isEmpty()) {
-            appConfig.setTargetHostname(hostname);
-            configService.saveConfiguration(appConfig.getConfiguration());
-            System.out.println("Target hostname configured: " + hostname);
-        } else {
-            System.out.println("Error: No hostname provided. Initialization aborted.");
-            return;
-        }
-        
-        // Create test directory
         try {
-            createTestDirectory();
-            createNavigationTest();
+            // Set variables in appConfig if provided
+            if (variables != null && !variables.isEmpty()) {
+                variables.forEach((name, value) -> appConfig.setVariable(name, value));
+            }
+            
+            createProjectStructure();
+            createConfigFile();
+            createSampleTask();
             System.out.println("Gepetto project initialized successfully!");
-            System.out.println("- Configuration saved to .gepetto/config.yaml");
-            System.out.println("- Sample test created at " + TEST_DIR + "/" + SAMPLE_TEST_FILENAME);
-            System.out.println("\nTo run your test: gepetto run " + TEST_DIR + "/" + SAMPLE_TEST_FILENAME);
+            System.out.println("- Project structure created at " + PROJECT_DIR + "/");
+            System.out.println("- Configuration saved to " + PROJECT_DIR + "/" + CONFIG_FILENAME);
+            System.out.println("- Sample task created at " + PROJECT_DIR + "/" + TASKS_DIR + "/" + SAMPLE_TASK_FILENAME);
+            System.out.println("\nTo run your task: gepetto run " + PROJECT_DIR + "/" + TASKS_DIR + "/" + SAMPLE_TASK_FILENAME);
         } catch (IOException e) {
             logger.error("Error initializing project: {}", e.getMessage(), e);
             System.err.println("Error initializing project: " + e.getMessage());
         }
     }
     
-    private void createTestDirectory() throws IOException {
-        Path testDir = Paths.get(TEST_DIR);
-        if (!Files.exists(testDir)) {
-            logger.info("Creating test directory: {}", testDir);
-            Files.createDirectories(testDir);
+    private void createProjectStructure() throws IOException {
+        // Create main project directory
+        Path projectDir = Paths.get(PROJECT_DIR);
+        if (!Files.exists(projectDir)) {
+            logger.info("Creating project directory: {}", projectDir);
+            Files.createDirectories(projectDir);
+        }
+        
+        // Create tasks directory
+        Path tasksDir = Paths.get(PROJECT_DIR, TASKS_DIR);
+        if (!Files.exists(tasksDir)) {
+            logger.info("Creating tasks directory: {}", tasksDir);
+            Files.createDirectories(tasksDir);
+        }
+        
+        // Create results directory
+        Path resultsDir = Paths.get(PROJECT_DIR, RESULTS_DIR);
+        if (!Files.exists(resultsDir)) {
+            logger.info("Creating results directory: {}", resultsDir);
+            Files.createDirectories(resultsDir);
         }
     }
     
-    private void createNavigationTest() throws IOException {
-        Path testPath = Paths.get(TEST_DIR, SAMPLE_TEST_FILENAME);
+    private void createConfigFile() throws IOException {
+        Path configPath = Paths.get(PROJECT_DIR, CONFIG_FILENAME);
+        
+        StringBuilder configContent = new StringBuilder();
+        configContent.append("# Gepetto Configuration\n\n");
+        
+        // Add variables section
+        configContent.append("variables:\n");
+        if (variables != null && !variables.isEmpty()) {
+            for (java.util.Map.Entry<String, String> entry : variables.entrySet()) {
+                configContent.append("  ").append(entry.getKey()).append(": \"").append(entry.getValue()).append("\"\n");
+            }
+        } else {
+            configContent.append("  # Example variables:\n");
+            configContent.append("  # HOSTNAME: \"example.com\"\n");
+            configContent.append("  # USERNAME: \"user@example.com\"\n");
+        }
+        
+        configContent.append("debug: false\n");
+        configContent.append("timeout: 30000\n");
+        
+        Files.writeString(configPath, configContent.toString());
+    }
+    
+    private void createSampleTask() throws IOException {
+        Path taskPath = Paths.get(PROJECT_DIR, TASKS_DIR, SAMPLE_TASK_FILENAME);
         String currentDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
-        StringBuilder testContent = new StringBuilder();
-        testContent.append("# Basic Navigation Test\n");
-        testContent.append("description: \"Navigate to the application homepage\"\n");
-        testContent.append("tags: [navigation, smoke]\n");
-        testContent.append("author: \"Gepetto\"\n");
-        testContent.append("created: \"").append(currentDate).append("\"\n\n");
-        testContent.append("Test:\n");
-        testContent.append("  Navigate to the homepage.\n");
-        
-        Files.writeString(testPath, testContent.toString());
+        StringBuilder taskContent = new StringBuilder();
+        taskContent.append("# Sample Login Task\n");
+        taskContent.append("description: \"Log in to the application with valid credentials\"\n");
+        taskContent.append("tags: [login, authentication]\n");
+        taskContent.append("author: \"Gepetto\"\n");
+        taskContent.append("created: \"").append(currentDate).append("\"\n\n");
+        taskContent.append("Task:\n");
+        taskContent.append("  Navigate to ${HOSTNAME}/login.\n");
+        taskContent.append("  Log in with username ${USERNAME} and password ${PASSWORD}.\n");
+        taskContent.append("  Verify that the dashboard page is displayed.\n");
+        taskContent.append("  Logout from the application.\n");
+        taskContent.append("  Verify that you are back to the login screen.\n");
+
+        Files.writeString(taskPath, taskContent.toString());
     }
 }

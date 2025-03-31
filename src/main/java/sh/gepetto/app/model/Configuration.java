@@ -15,7 +15,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Configuration {
-    private String targetHostname;
     private String logPath;
 
     @Builder.Default
@@ -24,10 +23,13 @@ public class Configuration {
     @Builder.Default
     private boolean debug = false;
 
+    @Builder.Default
+    private java.util.Map<String, String> variables = new java.util.HashMap<>();
+
     @Override
     public String toString() {
         return "Configuration{" +
-                "targetHostname='" + targetHostname + '\'' +
+                "variables=" + variables +
                 ", debug=" + debug +
                 '}';
     }
