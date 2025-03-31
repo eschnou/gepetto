@@ -9,13 +9,13 @@ import java.util.List;
 
 @Data
 @Builder
-public class TestResult {
+public class TaskResult {
 
     public enum Status {
-        PASSED, FAILED, ERROR
+        SUCCESS, FAILED, ERROR
     }
 
-    private QATest test;
+    private TaskDetails task;
     private Status status;
     private LocalDateTime executionTime;
     private long executionDurationMs;

@@ -2,14 +2,13 @@ package sh.gepetto.app.operator;
 
 import lombok.Builder;
 import lombok.Data;
-import org.opengpa.core.agent.Agent;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
 
 @Data
 @Builder
-public class TestRun {
+public class TaskRun {
 
   public enum Status {
     SUCCESS,

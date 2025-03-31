@@ -10,9 +10,9 @@ import picocli.CommandLine.Command;
 @Component
 @Command(
     name = "gepetto", 
-    description = "AI-powered natural language testing framework",
+    description = "AI-powered natural language task execution framework",
     mixinStandardHelpOptions = true,
-    subcommands = {RunTestCommand.class, InitCommand.class, HelpCommand.class, VersionCommand.class}
+    subcommands = {RunTaskCommand.class, InitCommand.class, HelpCommand.class, VersionCommand.class}
 )
 public class GepettoCommand implements Runnable {
     

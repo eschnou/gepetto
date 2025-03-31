@@ -4,15 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sh.gepetto.app.model.StepResult;
-import sh.gepetto.app.model.TestResult;
+import sh.gepetto.app.model.TaskResult;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * Service for generating JUnit XML reports from Gepetto test results
@@ -30,12 +28,12 @@ public class JUnitReportService {
      * @return The path to the saved report file
      * @throws IOException If there is an error writing the file
      */
-    public Path saveReport(TestResult result) throws IOException {
+    public Path saveReport(TaskResult result) throws IOException {
         // Create results directory structure
         String timestamp = result.getExecutionTime().format(TIMESTAMP_FORMATTER);
-        String testName = sanitizeFileName(result.getTest().getName());
+        String taskName = sanitizeFileName(result.getTask().getName());
         
-        Path resultsDir = Path.of("gepetto", "results", testName, timestamp);
+        Path resultsDir = Path.of("gepetto", "results", taskName, timestamp);
         Files.createDirectories(resultsDir);
         
         // Create the XML report
@@ -58,12 +56,12 @@ public class JUnitReportService {
     /**
      * Save the test result as a JSON file
      */
-    private void saveJsonReport(TestResult result, Path jsonFile) throws IOException {
+    private void saveJsonReport(TaskResult result, Path jsonFile) throws IOException {
         // Simple JSON serialization
         StringBuilder json = new StringBuilder();
         json.append("{\n");
-        json.append("  \"testName\": \"").append(escapeJson(result.getTest().getName())).append("\",\n");
-        json.append("  \"testDescription\": \"").append(escapeJson(result.getTest().getDescription())).append("\",\n");
+        json.append("  \"testName\": \"").append(escapeJson(result.getTask().getName())).append("\",\n");
+        json.append("  \"testDescription\": \"").append(escapeJson(result.getTask().getDescription())).append("\",\n");
         json.append("  \"status\": \"").append(result.getStatus()).append("\",\n");
         json.append("  \"executionTime\": \"").append(result.getExecutionTime().format(ISO_FORMATTER)).append("\",\n");
         json.append("  \"executionDurationMs\": ").append(result.getExecutionDurationMs()).append(",\n");
@@ -102,25 +100,25 @@ public class JUnitReportService {
     /**
      * Generate a JUnit XML report from a test result
      */
-    private String generateJUnitXml(TestResult result) {
+    private String generateJUnitXml(TaskResult result) {
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         
         // Calculate test statistics
         int failures = 0;
         int errors = 0;
-        int tests = result.getStepResults().size();
+        int tasks = result.getStepResults().size();
         
-        if (result.getStatus() == TestResult.Status.FAILED) {
+        if (result.getStatus() == TaskResult.Status.FAILED) {
             failures = 1;
-        } else if (result.getStatus() == TestResult.Status.ERROR) {
+        } else if (result.getStatus() == TaskResult.Status.ERROR) {
             errors = 1;
         }
         
         // Build the testsuite element
         xml.append("<testsuite");
-        xml.append(" name=\"").append(escapeXml(result.getTest().getName())).append("\"");
-        xml.append(" tests=\"").append(tests).append("\"");
+        xml.append(" name=\"").append(escapeXml(result.getTask().getName())).append("\"");
+        xml.append(" tasks=\"").append(tasks).append("\"");
         xml.append(" failures=\"").append(failures).append("\"");
         xml.append(" errors=\"").append(errors).append("\"");
         xml.append(" skipped=\"0\"");
@@ -131,8 +129,8 @@ public class JUnitReportService {
         
         // Add test properties
         xml.append("  <properties>\n");
-        xml.append("    <property name=\"testName\" value=\"").append(escapeXml(result.getTest().getName())).append("\"/>\n");
-        xml.append("    <property name=\"testDescription\" value=\"").append(escapeXml(result.getTest().getDescription())).append("\"/>\n");
+        xml.append("    <property name=\"testName\" value=\"").append(escapeXml(result.getTask().getName())).append("\"/>\n");
+        xml.append("    <property name=\"testDescription\" value=\"").append(escapeXml(result.getTask().getDescription())).append("\"/>\n");
         xml.append("  </properties>\n");
         
         // Add test cases (steps)
@@ -145,7 +143,7 @@ public class JUnitReportService {
             xml.append(">\n");
             
             // Add failure or error information if any
-            if (step.getStatus() == TestResult.Status.FAILED) {
+            if (step.getStatus() == TaskResult.Status.FAILED) {
                 xml.append("    <failure");
                 xml.append(" message=\"Step failed\"");
                 xml.append(" type=\"sh.gepetto.StepFailure\"");
@@ -154,7 +152,7 @@ public class JUnitReportService {
                     xml.append(escapeXml(step.getDetails()));
                 }
                 xml.append("</failure>\n");
-            } else if (step.getStatus() == TestResult.Status.ERROR) {
+            } else if (step.getStatus() == TaskResult.Status.ERROR) {
                 xml.append("    <error");
                 xml.append(" message=\"Step error\"");
                 xml.append(" type=\"sh.gepetto.StepError\"");

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 /**
- * Configuration model for test execution
+ * Configuration model for task execution
  * This class is used for both in-memory configuration and serialized to YAML
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

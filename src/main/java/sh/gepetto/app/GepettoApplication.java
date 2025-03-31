@@ -14,8 +14,8 @@ import picocli.CommandLine;
 /**
  * Gepetto Application Entry Point
  *
- * Gepetto is a natural language testing framework that allows users
- * to write and execute tests in plain English.
+ * Gepetto is a natural language task execution framework that allows users
+ * to write and execute tasks in plain English.
  */
 @SpringBootApplication
 @EnableOpenGPA

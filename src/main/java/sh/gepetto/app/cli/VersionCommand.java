@@ -20,7 +20,7 @@ public class VersionCommand implements Runnable {
     @Override
     public void run() {
         System.out.println("Gepetto version " + version);
-        System.out.println("AI-powered natural language testing framework");
+        System.out.println("AI-powered natural language task execution framework");
         System.out.println("Copyright © 2025");
     }
 }

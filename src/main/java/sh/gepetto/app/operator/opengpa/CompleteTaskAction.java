@@ -13,9 +13,9 @@ import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class CompleteTestAction implements Action {
+public class CompleteTaskAction implements Action {
 
-    public static final String NAME = "complete_test";
+    public static final String NAME = "complete_task";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -26,19 +26,19 @@ public class CompleteTestAction implements Action {
 
     @Override
     public String getDescription() {
-        return "Invoke this action when the test is complete, either passed, failed or you encountered an error.";
+        return "Invoke this action when the task is complete, either passed, failed or you encountered an error.";
     }
 
     @Override
     public JsonNode getJsonSchema() {
-        return JsonSchemaUtils.generateSchemaFromClass(CompleteTestActionInput.class);
+        return JsonSchemaUtils.generateSchemaFromClass(CompleteTaskActionInput.class);
     }
 
     @Override
     public ActionResult apply(Agent agent, Map<String, Object> input, Map<String, String> context) {
-        CompleteTestActionInput actionInput;
+        CompleteTaskActionInput actionInput;
         try {
-            actionInput = objectMapper.convertValue(input, CompleteTestActionInput.class);
+            actionInput = objectMapper.convertValue(input, CompleteTaskActionInput.class);
         } catch (Exception e) {
             return ActionResult.builder()
                     .status(ActionResult.Status.FAILURE)

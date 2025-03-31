@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a test written in natural language
+ * Represents a task written in natural language
  */
-public class QATest {
+public class TaskDetails {
     private String name;
     private String description;
     private List<String> tags;
@@ -15,12 +15,12 @@ public class QATest {
     private LocalDateTime created;
     private List<String> steps;
 
-    public QATest() {
+    public TaskDetails() {
         this.tags = new ArrayList<>();
         this.steps = new ArrayList<>();
     }
 
-    public QATest(String name, String description) {
+    public TaskDetails(String name, String description) {
         this();
         this.name = name;
         this.description = description;
@@ -80,7 +80,7 @@ public class QATest {
 
     @Override
     public String toString() {
-        return "Test{" +
+        return "TaskDetails{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +

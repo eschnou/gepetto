@@ -2,10 +2,10 @@ package sh.gepetto.app.operator.opengpa;
 
 import sh.gepetto.app.config.ApplicationConfig;
 import sh.gepetto.app.model.StepResult;
-import sh.gepetto.app.model.QATest;
-import sh.gepetto.app.model.TestResult;
-import sh.gepetto.app.operator.TestOperator;
-import sh.gepetto.app.operator.TestRun;
+import sh.gepetto.app.model.TaskDetails;
+import sh.gepetto.app.model.TaskResult;
+import sh.gepetto.app.operator.TaskOperator;
+import sh.gepetto.app.operator.TaskRun;
 import lombok.extern.slf4j.Slf4j;
 import org.opengpa.core.action.Action;
 import org.opengpa.core.action.OutputMessageAction;
@@ -24,7 +24,7 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class OpengPGATestOperator implements TestOperator {
+public class OpengPGATaskOperator implements TaskOperator {
 
     // lists to hold agents and their respective steps
     private final HashMap<String, Agent> agents = new HashMap<>();
@@ -36,7 +36,7 @@ public class OpengPGATestOperator implements TestOperator {
     private final ApplicationConfig applicationConfig;
     private final List<Action> actions;
 
-    public OpengPGATestOperator(ChatModel chatModel, Workspace workspace, McpActionProvider mcpActionProvider, ApplicationConfig applicationConfig, List<Action> actions) {
+    public OpengPGATaskOperator(ChatModel chatModel, Workspace workspace, McpActionProvider mcpActionProvider, ApplicationConfig applicationConfig, List<Action> actions) {
         this.chatModel = chatModel;
         this.workspace = workspace;
         this.applicationConfig = applicationConfig;
@@ -53,45 +53,45 @@ public class OpengPGATestOperator implements TestOperator {
     }
 
     @Override
-    public TestRun plan(QATest test) {
-        Map<String, String> testContext = new HashMap<>();
-        testContext.put("test", test.getName());
+    public TaskRun plan(TaskDetails task) {
+        Map<String, String> taskContext = new HashMap<>();
+        taskContext.put("task", task.getName());
         
         // Add hostname if defined
         String hostname = applicationConfig.getVariable("HOSTNAME");
         if (hostname != null) {
-            testContext.put("hostname", hostname);
+            taskContext.put("hostname", hostname);
         }
 
-        ReActAgent agent = new ReActAgent(chatModel, workspace, actions, test.getDescription(), testContext);
+        ReActAgent agent = new ReActAgent(chatModel, workspace, actions, task.getDescription(), taskContext);
         if (StringUtils.hasText(applicationConfig.getConfiguration().getLogPath())) {
             agent.enableLogging(new File(applicationConfig.getConfiguration().getLogPath()));
         }
 
-        TestRun testRun = TestRun.builder()
+        TaskRun taskRun = TaskRun.builder()
                 .created(ZonedDateTime.now())
-                .context(testContext)
+                .context(taskContext)
                 .id(agent.getId())
-                .title(test.getName())
+                .title(task.getName())
                 .build();
 
         agents.put(agent.getId(), agent);
-        return testRun;
+        return taskRun;
     }
 
     @Override
-    public StepResult nextStep(TestRun testRun, String input) {
+    public StepResult nextStep(TaskRun taskRun, String input) {
 
-        List<AgentStep> testSteps = steps.getOrDefault(testRun.getId(), new ArrayList<>());
-        steps.put(testRun.getId(),testSteps);
+        List<AgentStep> taskSteps = steps.getOrDefault(taskRun.getId(), new ArrayList<>());
+        steps.put(taskRun.getId(),taskSteps);
 
         int stepCount = 0;
         while (stepCount < applicationConfig.getConfiguration().getMaxSteps()) {
-            AgentStep step = agents.get(testRun.getId()).executeNextStep(input, new HashMap<>(), new HashMap<>());
-            testSteps.add(step);
+            AgentStep step = agents.get(taskRun.getId()).executeNextStep(input, new HashMap<>(), new HashMap<>());
+            taskSteps.add(step);
 
-            if (step.getAction().getName().equals(CompleteTestAction.NAME)) {
-                CompleteTestActionInput stepResult = (CompleteTestActionInput) step.getResult().getResult();
+            if (step.getAction().getName().equals(CompleteTaskAction.NAME)) {
+                CompleteTaskActionInput stepResult = (CompleteTaskActionInput) step.getResult().getResult();
                 return StepResult.builder()
                         .step(input)
                         .status(stepResult.getStatus())
@@ -102,7 +102,7 @@ public class OpengPGATestOperator implements TestOperator {
             if (step.isFinal()) {
                 return StepResult.builder()
                         .step(input)
-                        .status(TestResult.Status.ERROR)
+                        .status(TaskResult.Status.ERROR)
                         .details("Step complete with an outcome.")
                         .build();
             }
@@ -112,7 +112,7 @@ public class OpengPGATestOperator implements TestOperator {
 
         return StepResult.builder()
                 .step(input)
-                .status(TestResult.Status.ERROR)
+                .status(TaskResult.Status.ERROR)
                 .details("Could not complete the step below the maximum number of actions.")
                 .build();
     }

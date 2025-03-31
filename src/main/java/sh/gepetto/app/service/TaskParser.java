@@ -1,6 +1,6 @@
 package sh.gepetto.app.service;
 
-import sh.gepetto.app.model.QATest;
+import sh.gepetto.app.model.TaskDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,28 +15,27 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Service for parsing test files into Test objects
+ * Service for parsing task files into TaskDetails objects
  */
 @Service
-public class TestParser {
-    private static final Logger logger = LoggerFactory.getLogger(TestParser.class);
+public class TaskParser {
+    private static final Logger logger = LoggerFactory.getLogger(TaskParser.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
-     * Parse a test file into a Test object
+     * Parse a task file into a TaskDetails object
      *
-     * @param filePath the path to the test file
-     * @return the parsed Test
+     * @param filePath the path to the task file
+     * @return the parsed TaskDetails
      * @throws IOException if an error occurs reading the file
      */
-    public QATest parseTestFile(Path filePath) throws IOException {
-        logger.info("Parsing test file: {}", filePath);
+    public TaskDetails parseTaskFile(Path filePath) throws IOException {
+        logger.info("Parsing task file: {}", filePath);
 
-        QATest test = new QATest();
+        TaskDetails task = new TaskDetails();
 
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
-            boolean inTestSection = false;
             boolean inTaskSection = false;
 
             while ((line = reader.readLine()) != null) {
@@ -47,50 +46,47 @@ public class TestParser {
                     continue;
                 }
 
-                // Parse test metadata
+                // Parse task metadata
                 if (line.startsWith("description:")) {
-                    test.setDescription(extractQuotedValue(line));
+                    task.setDescription(extractQuotedValue(line));
                 } else if (line.startsWith("tags:")) {
                     String tagsStr = line.substring(5).trim();
                     if (tagsStr.startsWith("[") && tagsStr.endsWith("]")) {
                         tagsStr = tagsStr.substring(1, tagsStr.length() - 1);
                     }
                     List<String> tags = Arrays.asList(tagsStr.split(","));
-                    test.setTags(tags.stream().map(String::trim).toList());
+                    task.setTags(tags.stream().map(String::trim).toList());
                 } else if (line.startsWith("author:")) {
-                    test.setAuthor(extractQuotedValue(line));
+                    task.setAuthor(extractQuotedValue(line));
                 } else if (line.startsWith("created:")) {
                     String dateStr = extractQuotedValue(line);
-                    test.setCreated(LocalDate.parse(dateStr, DATE_FORMATTER).atStartOfDay());
+                    task.setCreated(LocalDate.parse(dateStr, DATE_FORMATTER).atStartOfDay());
                 }
 
-                // Parse test/task steps
-                if (line.equals("Test:")) {
-                    inTestSection = true;
-                    continue;
-                } else if (line.equals("Task:")) {
+                // Parse task steps
+                if (line.equals("Task:")) {
                     inTaskSection = true;
                     continue;
                 }
 
-                if (inTestSection || inTaskSection) {
-                    test.addStep(line);
+                if (inTaskSection) {
+                    task.addStep(line);
                 }
             }
         }
 
-        // Use filename as test name if not specified
-        if (test.getName() == null) {
+        // Use filename as task name if not specified
+        if (task.getName() == null) {
             String fileName = filePath.getFileName().toString();
-            if (fileName.endsWith(".test")) {
+            if (fileName.endsWith(".task")) {
                 fileName = fileName.substring(0, fileName.length() - 5);
             } else if (fileName.endsWith(".gpt")) {
                 fileName = fileName.substring(0, fileName.length() - 4);
             }
-            test.setName(fileName.replace("-", " "));
+            task.setName(fileName.replace("-", " "));
         }
 
-        return test;
+        return task;
     }
 
     /**
@@ -99,7 +95,7 @@ public class TestParser {
      * @param filePath the path to the file
      * @return true if the file has a valid extension (.test or .gpt)
      */
-    public boolean isValidTestFile(Path filePath) {
+    public boolean isValidTaskFile(Path filePath) {
         String fileName = filePath.getFileName().toString();
         return fileName.endsWith(".test") || fileName.endsWith(".gpt");
     }

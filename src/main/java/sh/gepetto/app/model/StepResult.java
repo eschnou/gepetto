@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class StepResult {
     private String step;
-    private TestResult.Status status;
+    private TaskResult.Status status;
     private String details;
     private String screenshot;
 }

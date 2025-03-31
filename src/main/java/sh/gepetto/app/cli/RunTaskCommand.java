@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import sh.gepetto.app.model.Configuration;
-import sh.gepetto.app.model.QATest;
-import sh.gepetto.app.model.TestResult;
+import sh.gepetto.app.model.TaskDetails;
+import sh.gepetto.app.model.TaskResult;
 import sh.gepetto.app.service.JUnitReportService;
-import sh.gepetto.app.service.TestExecutionService;
-import sh.gepetto.app.service.TestParser;
+import sh.gepetto.app.service.TaskExecutionService;
+import sh.gepetto.app.service.TaskParser;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -29,13 +29,13 @@ import picocli.CommandLine.Option;
     name = "run", 
     description = "Run a task file"
 )
-public class RunTestCommand implements Runnable {
+public class RunTaskCommand implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(RunTestCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(RunTaskCommand.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
-    private final TestParser testParser;
-    private final TestExecutionService testExecutionService;
+    private final TaskParser taskParser;
+    private final TaskExecutionService taskExecutionService;
     private final ApplicationConfig appConfig;
     private final JUnitReportService reportService;
     
@@ -51,13 +51,13 @@ public class RunTestCommand implements Runnable {
     @picocli.CommandLine.Parameters(index = "0", description = "Path to the task file to run (.test or .gpt)")
     private String taskFilePath;
     
-    public RunTestCommand(
-            TestParser testParser, 
-            TestExecutionService testExecutionService, 
+    public RunTaskCommand(
+            TaskParser taskParser,
+            TaskExecutionService taskExecutionService,
             ApplicationConfig appConfig,
             JUnitReportService reportService) {
-        this.testParser = testParser;
-        this.testExecutionService = testExecutionService;
+        this.taskParser = taskParser;
+        this.taskExecutionService = taskExecutionService;
         this.appConfig = appConfig;
         this.reportService = reportService;
     }
@@ -98,16 +98,16 @@ public class RunTestCommand implements Runnable {
             }
             
             // Validate file extension
-            if (!testParser.isValidTestFile(path)) {
+            if (!taskParser.isValidTaskFile(path)) {
                 System.out.println("Error: Invalid file type. File must have .test or .gpt extension: " + taskFilePath);
                 return;
             }
 
-            QATest task = testParser.parseTestFile(path);
+            TaskDetails task = taskParser.parseTaskFile(path);
             logger.info("Parsed task: {}", task);
 
             // Execute task
-            TestResult result = testExecutionService.executeTest(config, task);
+            TaskResult result = taskExecutionService.executeTask(config, task);
 
             // Print result
             System.out.println(formatTaskResult(result));
@@ -128,11 +128,11 @@ public class RunTestCommand implements Runnable {
         }
     }
     
-    private String formatTaskResult(TestResult result) {
+    private String formatTaskResult(TaskResult result) {
         StringBuilder sb = new StringBuilder();
         sb.append("\n===== TASK RESULT =====\n");
-        sb.append("Task: ").append(result.getTest().getName()).append("\n");
-        sb.append("Description: ").append(result.getTest().getDescription()).append("\n");
+        sb.append("Task: ").append(result.getTask().getName()).append("\n");
+        sb.append("Description: ").append(result.getTask().getDescription()).append("\n");
         sb.append("Status: ").append(result.getStatus()).append("\n");
         sb.append("Execution Time: ").append(result.getExecutionTime().format(DATE_FORMATTER)).append("\n");
         sb.append("Duration: ").append(result.getExecutionDurationMs()).append("ms\n");

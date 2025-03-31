@@ -12,7 +12,7 @@
 	<artifactId>gepetto</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>gepetto</name>
-	<description>AI-powered natural language testing framework</description>
+	<description>AI-powered natural language task execution framework</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -115,7 +115,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>dev</id>
