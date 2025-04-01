@@ -75,9 +75,15 @@ sudo ./install.sh
 
 ## 🕹️Usage
 
+By default, Gepetto uses OpenAI gpt-4o as LLM. You therefore need an API key defined
+either as en environment variable or in a .env file.
+
 ```bash
 # Export your Openai key (check documentation to use other providers)
 export OPENAI_API_KEY=sk-***
+
+# Alternate is to store it in a .env file
+echo OPENAI_API_KEY=sk-*** > .env
 
 # Initialize a new project
 gepetto init
