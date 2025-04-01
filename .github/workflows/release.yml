@@ -84,14 +84,14 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ vars.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Upload to S3
         run: |
-          S3_BUCKET="${{ env.S3_BUCKET }}"
-          S3_KEY_PREFIX="${{ env.S3_KEY_PREFIX || 'releases' }}"
+          S3_BUCKET="${{ vars.S3_BUCKET }}"
+          S3_KEY_PREFIX="${{ vars.S3_KEY_PREFIX || 'releases' }}"
           
           # Upload artifact
           aws s3 cp "${ARTIFACT_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}" --acl private
