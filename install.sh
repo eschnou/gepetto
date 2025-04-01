@@ -32,6 +32,11 @@ cat > "$BIN_PATH" << 'EOF'
 #!/bin/bash
 # Gepetto CLI wrapper
 
+# Load environment variables from .env file if it exists in current directory
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 # Run the JAR with all arguments passed to this script
 java -jar "/usr/local/share/gepetto/gepetto.jar" "$@"
 EOF
