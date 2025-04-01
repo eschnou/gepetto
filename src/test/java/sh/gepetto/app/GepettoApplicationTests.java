@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class AigenqaApplicationTests {
+class GepettoApplicationTests {
 
 	@Test
 	void contextLoads() {
