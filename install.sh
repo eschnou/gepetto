@@ -14,15 +14,18 @@ BIN_PATH="/usr/local/bin/gepetto"
 # Create installation directory if it doesn't exist
 mkdir -p "$INSTALL_DIR"
 
+# Get the version from the .version file
+VERSION=$(cat .version | head -1)
+
 # Build the JAR if not already built
-if [ ! -f "target/gepetto-0.1.0.jar" ]; then
+if [ ! -f "target/gepetto-$VERSION.jar" ]; then
   echo "Building Gepetto JAR..."
   ./mvnw clean package
 fi
 
 # Copy the JAR to the installation directory
 echo "Installing Gepetto to $INSTALL_DIR..."
-cp target/gepetto-0.1.0.jar "$INSTALL_DIR/gepetto.jar"
+cp "target/gepetto-$VERSION.jar" "$INSTALL_DIR/gepetto.jar"
 
 # Create the wrapper script in /usr/local/bin
 cat > "$BIN_PATH" << 'EOF'
