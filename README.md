@@ -61,16 +61,24 @@ cd gepetto
 # Build executable JAR
 ./mvnw clean package
 
-# Install to system (requires sudo)
-sudo ./install.sh
+# Install Playwright MCP
+npm install @playwright/mcp
+npx playwright install
+npx playwright install chrome
 
-# Or run locally without installing
+# Run locally without installing
 ./gepetto help
+
+# Or install to system (requires sudo)
+sudo ./install.sh
 ```
 
 ## 🕹️Usage
 
 ```bash
+# Export your Openai key (check documentation to use other providers)
+export OPENAI_API_KEY=sk-***
+
 # Initialize a new project
 gepetto init
 
@@ -135,6 +143,25 @@ Playwright MCP will launch Chrome browser with the new profile, located at
 
 All the logged in information will be stored in that profile, you can delete it between 
 sessions if you'd like to clear the offline state.
+
+### Running headless on a server
+
+If you want to run Gepetto on a server (without UI) in headless mode, you need to modify the MCP
+configuration at `src/main/resources/mcp-config.json` and then rebuild the application.
+
+```
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless"
+      ]
+    }
+  }
+}
+```
 
 ## 👷‍♂️Development
 
