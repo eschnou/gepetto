@@ -55,7 +55,7 @@ Test report saved to: gepetto/results/login/20250401_072929/junit-report.xml
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/gepetto.git
+git clone https://github.com/eschnou/gepetto.git
 cd gepetto
 
 # Build executable JAR
