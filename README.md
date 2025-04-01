@@ -1,18 +1,57 @@
-# Gepetto
+# Gepetto - Run QA Tests written in natural language
 
-AI-powered natural language task execution framework that allows anyone to write and run tasks using plain English. The
-primary use case is running browser test cases, but it could be used for any other task automation needs.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
 
-This is a minimal implementation of Gepetto that supports:
-- Basic configuration
+**Gepetto** is an AI-powered natural language task execution framework that allows anyone to write and run tasks 
+using natural language. The primary use case is running browser test cases, but it could be used 
+for any other task automation needs.
+
+## 🛠️️ Key Features
+
 - Running a task described in natural language
+- Sequential step processing, only proceed to next step if previous succeeded
 - Capturing task results in JUnit XML
 - Support all LLM supported by Spring AI (gpt, claude, ollama, etc..)
-- Supports MCP to connect to third party actions 
+- Supports MCP to connect to third party actions providers
 
-## Installation
+## 🤖Example of a Test Execution
+
+```
+===== TASK RESULT =====
+Task: login
+Description: Log in to the application with valid credentials
+Status: SUCCESS
+Execution Time: 2025-04-01 07:29:29
+Duration: 68753ms
+
+----- Step Results -----
+1. Navigate to https://wonderpod.ai.
+   Status: SUCCESS
+   Details: The step to navigate to the URL 'https://wonderpod.ai' was already completed successfully.
+2. Navigate to the login page.
+   Status: SUCCESS
+   Details: The step to navigate to the login page was already completed successfully.
+3. Log in with username testuser2 and password trustno1.
+   Status: SUCCESS
+   Details: The login with username testuser2 and password trustno1 was successful, and the user was redirected to the dashboard.
+4. Verify that the dashboard page is displayed.
+   Status: SUCCESS
+   Details: The dashboard page is successfully displayed, as verified by the accessibility snapshot.
+5. Logout from the application with the last icon on the right.
+   Status: SUCCESS
+   Details: The logout was successful, and the user has been redirected to the login page.
+6. Verify that you are back to the login screen.
+   Status: SUCCESS
+   Details: Verification complete: The user is back on the login screen as confirmed by the accessibility snapshot.
+
+=======================
+
+Test report saved to: gepetto/results/login/20250401_072929/junit-report.xml
+
+```
+
+## 🏗️ Installation
 
 ```bash
 # Clone repository
@@ -29,7 +68,7 @@ sudo ./install.sh
 ./gepetto help
 ```
 
-## Usage
+## 🕹️Usage
 
 ```bash
 # Initialize a new project
@@ -39,7 +78,7 @@ gepetto init
 gepetto run gepetto/tasks/login.gpt
 ```
 
-## Task File Format
+### Task File Format
 
 ```
 # Task Name
@@ -49,19 +88,18 @@ author: "Author Name"
 created: "2025-03-15"
 
 Test:
-  Visit the login page at ${HOSTNAME}.
+  Visit ${HOSTNAME}.
+  Navigate to the login page.
   Login with username ${USERNAME} and password ${PASSWORD}.
   Verify user is logged in and on the main dashboard.
   Click the logout button.
   Verify you are back to the login page.
 ```
 
-## Variables
+### Variables
 
 Gepetto supports variables in task files using the `${VARIABLE}` syntax. Variables allow your 
 tasks to be reusable across different environments and scenarios.
-
-### Variable Sources
 
 Variables can be defined from two sources:
 
@@ -77,12 +115,18 @@ Variables can be defined from two sources:
    gepetto run task.gpt --var PASSWORD=secret123
    ```
 
-### Precedence
+## 🔧Configuration
 
-When the same variable is defined in multiple places, command line arguments take precedence 
-over the configuration file.
+### LLM Configuration
 
-## Clearing the cache
+Gepetto is built with [OpenGPA](https://github.com/eschnou/OpenGPA), an open source agentic orchestration
+framework built in Java. It is built on top of [Spring AI](https://docs.spring.io/spring-ai/reference/index.html) and thus
+supports many different Chat Models. Do refer to the OpenGPA and Spring documentation to configure Gepetto to your needs.
+
+### Playwright Configuration
+
+Gepetto is controlling a browser using Playwright over the MCP protocol. For details
+on the Playwright configuration and caching; visit their [plugin documentation](https://github.com/microsoft/playwright-mcp.
 
 Playwright MCP will launch Chrome browser with the new profile, located at
 - `%USERPROFILE%\AppData\Local\ms-playwright\mcp-chrome-profile` on Windows
@@ -92,7 +136,7 @@ Playwright MCP will launch Chrome browser with the new profile, located at
 All the logged in information will be stored in that profile, you can delete it between 
 sessions if you'd like to clear the offline state.
 
-## Development
+## 👷‍♂️Development
 
 ### Running from Source
 
@@ -104,6 +148,11 @@ sessions if you'd like to clear the offline state.
 ./mvnw clean package
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
+
+# Support
+- Join us on [Discord](https://discord.gg/3XPsmCRNE2)
+- Reach out on [Bluesky](https://bsky.app/profile/eschnou.com)
+- File an [issue](https://github.com/eschnou/gepetto/issues)
 
 # License
 
