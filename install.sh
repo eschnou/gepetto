@@ -15,14 +15,14 @@ BIN_PATH="/usr/local/bin/gepetto"
 mkdir -p "$INSTALL_DIR"
 
 # Build the JAR if not already built
-if [ ! -f "target/gepetto-0.0.1-SNAPSHOT.jar" ]; then
+if [ ! -f "target/gepetto-0.1.0.jar" ]; then
   echo "Building Gepetto JAR..."
   ./mvnw clean package
 fi
 
 # Copy the JAR to the installation directory
 echo "Installing Gepetto to $INSTALL_DIR..."
-cp target/gepetto-0.0.1-SNAPSHOT.jar "$INSTALL_DIR/"
+cp target/gepetto-0.1.0.jar "$INSTALL_DIR/gepetto.jar"
 
 # Create the wrapper script in /usr/local/bin
 cat > "$BIN_PATH" << 'EOF'
@@ -30,7 +30,7 @@ cat > "$BIN_PATH" << 'EOF'
 # Gepetto CLI wrapper
 
 # Run the JAR with all arguments passed to this script
-java -jar "/usr/local/share/gepetto/gepetto-0.0.1-SNAPSHOT.jar" "$@"
+java -jar "/usr/local/share/gepetto/gepetto.jar" "$@"
 EOF
 
 # Make the wrapper script executable

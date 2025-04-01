@@ -2,13 +2,13 @@
 # Gepetto CLI wrapper script
 
 # Find the JAR file
-JAR_PATH="$(dirname "$0")/target/gepetto-0.0.1-SNAPSHOT.jar"
+JAR_PATH="$(dirname "$0")/target/gepetto-0.1.0.jar"
 
 # If JAR isn't in the relative path, check if this script was installed to PATH
 if [ ! -f "$JAR_PATH" ]; then
   # Try to find JAR in the installation directory
   INSTALL_DIR="/usr/local/share/gepetto"
-  JAR_PATH="$INSTALL_DIR/gepetto-0.0.1-SNAPSHOT.jar"
+  JAR_PATH="$INSTALL_DIR/gepetto-0.1.0.jar"
   
   if [ ! -f "$JAR_PATH" ]; then
     echo "Error: Could not find gepetto JAR file"
