@@ -1,18 +1,18 @@
-# Gepetto - Run QA Tests written in natural language
+# Gepetto - A minimalistic cli-based Operator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-**Gepetto** is an AI-powered natural language task execution framework that allows anyone to write and run tasks 
-using natural language. The primary use case is running browser test cases, but it could be used 
-for any other task automation needs.
+**Gepetto** is a minimalistic cli-based Operator: an AI Agent that uses its own browser to perform tasks for you.
+The primary use case is running browser test cases, but it could be used for any other task automation needs. It
+supports a wide variety of AI models and can leverage any tools exposed through MCP.
 
 ## 🛠️️ Key Features
 
-- Running a task described in natural language
+- Execute a task described in natural language
 - Sequential step processing, only proceed to next step if previous succeeded
-- Capturing task results in JUnit XML
-- Support all LLM supported by Spring AI (gpt, claude, ollama, etc..)
+- Reporting task results in JUnit XML
+- Support a wide variety of LLM (gpt, claude, ollama, etc..)
 - Supports MCP to connect to third party actions providers
 
 ## 🤖Example of a Test Execution
