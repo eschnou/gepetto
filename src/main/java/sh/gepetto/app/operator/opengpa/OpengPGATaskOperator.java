@@ -81,17 +81,29 @@ public class OpengPGATaskOperator implements TaskOperator {
 
     @Override
     public StepResult nextStep(TaskRun taskRun, String input) {
+        System.out.println("\n>> Executing step: " + input);
 
         List<AgentStep> taskSteps = steps.getOrDefault(taskRun.getId(), new ArrayList<>());
-        steps.put(taskRun.getId(),taskSteps);
+        steps.put(taskRun.getId(), taskSteps);
 
         int stepCount = 0;
         while (stepCount < applicationConfig.getConfiguration().getMaxSteps()) {
+            System.out.println("  - Action " + (stepCount + 1) + " in progress...");
+            
             AgentStep step = agents.get(taskRun.getId()).executeNextStep(input, new HashMap<>(), new HashMap<>());
             taskSteps.add(step);
 
+            // Log the action being executed and its reasoning
+            String actionName = step.getAction().getName();
+            String reasoning = step.getReasoning() != null ? step.getReasoning() : "No reasoning provided";
+            
+            System.out.println("    * Executing action: " + actionName);
+            System.out.println("    * Reasoning: " + reasoning.replaceAll("\\n", " ").trim());
+
             if (step.getAction().getName().equals(CompleteTaskAction.NAME)) {
                 CompleteTaskActionInput stepResult = (CompleteTaskActionInput) step.getResult().getResult();
+                System.out.println("  - Step completed with status: " + stepResult.getStatus());
+                
                 return StepResult.builder()
                         .step(input)
                         .status(stepResult.getStatus())
@@ -100,6 +112,8 @@ public class OpengPGATaskOperator implements TaskOperator {
             }
 
             if (step.isFinal()) {
+                System.out.println("  - Step reached final state without completion action");
+                
                 return StepResult.builder()
                         .step(input)
                         .status(TaskResult.Status.ERROR)
@@ -110,6 +124,8 @@ public class OpengPGATaskOperator implements TaskOperator {
             stepCount++;
         }
 
+        System.out.println("  - Maximum action count reached without completion");
+        
         return StepResult.builder()
                 .step(input)
                 .status(TaskResult.Status.ERROR)

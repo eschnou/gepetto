@@ -106,10 +106,10 @@ public class RunTaskCommand implements Runnable {
             TaskDetails task = taskParser.parseTaskFile(path);
             logger.info("Parsed task: {}", task);
 
-            // Execute task
+            // Execute task (detailed progress will be shown during execution)
             TaskResult result = taskExecutionService.executeTask(config, task);
 
-            // Print result
+            // Print final summary result
             System.out.println(formatTaskResult(result));
             
             // Save reports unless disabled
@@ -118,13 +118,15 @@ public class RunTaskCommand implements Runnable {
                     Path reportPath = reportService.saveReport(result);
                     System.out.println("Test report saved to: " + reportPath);
                 } catch (IOException e) {
-                    logger.error("Failed to save test report: {}", e.getMessage(), e);
+                    // Log without stack trace
+                    logger.error("Failed to save test report: {}", e.getMessage());
                     System.out.println("Warning: Failed to save test report: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
-            logger.error("Error running task: {}", e.getMessage(), e);
-            System.out.println("Error: " + e.getMessage());
+            // Log without stack trace
+            logger.error("Error running task: {}", e.getMessage());
+            System.out.println("\n❌ Error: " + e.getMessage());
         }
     }
     

@@ -59,12 +59,16 @@ public class TaskExecutionService {
             // If a variable is missing, mark the task as an error
             result.setStatus(TaskResult.Status.ERROR);
             result.setErrorMessage(e.getMessage());
-            logger.error("Error executing task - missing variable: {}", e.getMessage(), e);
+            // Log without stack trace for variable errors
+            logger.error("Error executing task - missing variable: {}", e.getMessage());
+            System.out.println("\n❌ Error: " + e.getMessage());
         } catch (Exception e) {
             // If an exception occurs, mark the task as an error
             result.setStatus(TaskResult.Status.ERROR);
             result.setErrorMessage(e.getMessage());
-            logger.error("Error executing task: {}", e.getMessage(), e);
+            // Log without stack trace for other errors
+            logger.error("Error executing task: {}", e.getMessage());
+            System.out.println("\n❌ Error: " + e.getMessage());
         } finally {
             // Calculate and set execution duration
             long endTime = System.currentTimeMillis();
@@ -80,11 +84,18 @@ public class TaskExecutionService {
      */
     private void processTaskSteps(Configuration configuration, TaskDetails task, TaskResult result) {
         // First, plan the task run with the TaskOperator
+        System.out.println("\n===== STARTING TASK: " + task.getName() + " =====");
+        System.out.println("Description: " + task.getDescription());
+        System.out.println("Total steps: " + task.getSteps().size());
+        
         TaskRun taskRun = taskOperator.plan(task);
         logger.info("Task run planned with ID: {}", taskRun.getId());
         
         // Process each step in the task
-        for (String step : task.getSteps()) {
+        for (int i = 0; i < task.getSteps().size(); i++) {
+            String step = task.getSteps().get(i);
+            System.out.println("\n===== STEP " + (i + 1) + "/" + task.getSteps().size() + " =====");
+            
             // Replace variables in the step
             // We've already validated all variables exist, so this should not fail
             String processedStep = replaceVariables(configuration, step);
@@ -102,9 +113,14 @@ public class TaskExecutionService {
                 stepResult.getStatus() == TaskResult.Status.ERROR) {
                 result.setStatus(stepResult.getStatus());
                 result.setErrorMessage("Step failed: " + processedStep);
+                System.out.println("\n❌ Step " + (i + 1) + " failed with status: " + stepResult.getStatus());
                 break;
+            } else {
+                System.out.println("\n✅ Step " + (i + 1) + " completed successfully");
             }
         }
+        
+        System.out.println("\n===== TASK EXECUTION COMPLETED =====");
     }
     
     /**
