@@ -8,45 +8,25 @@
 # Quick build (skip tests)
 ./mvnw clean package -P dev
 
-# Show main help
-./mvnw spring-boot:run -Dspring-boot.run.arguments="help"
-
-# Show help for a specific command
-./mvnw spring-boot:run -Dspring-boot.run.arguments="help run"
-
-# Show version information
-./mvnw spring-boot:run -Dspring-boot.run.arguments="version"
-
-# Initialize a new project
-./mvnw spring-boot:run -Dspring-boot.run.arguments="init --hostname example.com"
-
-# Configure the default hostname
-./mvnw spring-boot:run -Dspring-boot.run.arguments="configure --hostname example.com"
-
-# Enable debug mode
-./mvnw spring-boot:run -Dspring-boot.run.arguments="configure --debug"
-
-# Disable debug mode
-./mvnw spring-boot:run -Dspring-boot.run.arguments="configure --no-debug"
-
-# Run a task file (using configured hostname)
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt"
-
-# Run a task file (with explicit hostname)
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt --hostname example.com"
-
-# Run a task file with debug output
-./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt --debug"
-
-# Run from JAR (after building)
-java -jar target/gepetto-0.0.1-SNAPSHOT.jar run gepetto/tasks/login.gpt
-
 # Run all Java tests
 ./mvnw test
 
 # Run a single Java test
 ./mvnw test -Dtest=TestClassName#testMethodName
+
+# Run application with specific command
+./mvnw spring-boot:run -Dspring-boot.run.arguments="help"
+./mvnw spring-boot:run -Dspring-boot.run.arguments="run gepetto/tasks/login.gpt --debug"
+
+# Run from JAR (after building)
+java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
+
+## CLI Commands
+- `init`: Initialize a new Gepetto project (`--var, -v` to define variables)
+- `run <taskfile>`: Execute a task file (options: `--var, -v`, `--debug, -d`, `--no-report`)
+- `version`: Show version information
+- `help [command]`: Display help for commands
 
 ## Code Style Guidelines
 - **Package structure**: Maintain `sh.gepetto.app` with functional areas (`config`, `model`, `service`, `cli`)
