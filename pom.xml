@@ -32,14 +32,6 @@
 		<opengpa.version>0.4.0</opengpa.version>
 	</properties>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/eschnou/OpenGPA</url>
-		</repository>
-	</distributionManagement>
-
 	<repositories>
 		<repository>
 			<id>spring-milestones</id>
@@ -50,8 +42,9 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>github</id>
-			<url>https://maven.pkg.github.com/eschnou/OpenGPA</url>
+			<id>opengpa-repository</id>
+			<name>OpenGPA Repository</name>
+			<url>https://dist.opengpa.org/packages</url>
 		</repository>
 	</repositories>
 
