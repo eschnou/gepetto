@@ -1,0 +1,121 @@
+name: Build and Deploy Native Executable
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (optional)'
+        required: false
+        default: ''
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Native Executable
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: macos
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event.inputs.version }}" != "" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [ "${{ github.event.release.tag_name }}" != "" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+          else
+            VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          fi
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Build native executable
+        run: ./mvnw -Pnative native:compile
+
+      - name: Determine architecture
+        id: arch
+        run: |
+          ARCH=$(uname -m)
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+
+      - name: Create release package
+        run: |
+          ARTIFACT_NAME="gepetto"
+          ARTIFACT_FILE="${ARTIFACT_NAME}-${{ env.VERSION }}-${{ matrix.platform }}-${{ env.ARCH }}"
+          
+          # Copy executable with executable permissions
+          cp "target/${ARTIFACT_NAME}" "${ARTIFACT_FILE}"
+          chmod +x "${ARTIFACT_FILE}"
+          
+          # Create checksum
+          if [[ "${{ matrix.platform }}" == "linux" ]]; then
+            sha256sum "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
+          else
+            shasum -a 256 "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
+          fi
+          
+          echo "ARTIFACT_FILE=${ARTIFACT_FILE}" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Upload to S3
+        run: |
+          S3_BUCKET="${{ secrets.S3_BUCKET }}"
+          S3_KEY_PREFIX="${{ secrets.S3_KEY_PREFIX || 'releases' }}"
+          
+          # Upload artifact
+          aws s3 cp "${ARTIFACT_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}" --acl private
+          
+          # Upload checksum
+          aws s3 cp "${ARTIFACT_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}.sha256" --acl private
+          
+          echo "Uploaded to S3:"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}.sha256"
+
+      - name: Upload artifacts to GitHub Release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.ARTIFACT_FILE }}
+          asset_name: ${{ env.ARTIFACT_FILE }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload checksum to GitHub Release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.ARTIFACT_FILE }}.sha256
+          asset_name: ${{ env.ARTIFACT_FILE }}.sha256
+          asset_content_type: text/plain
