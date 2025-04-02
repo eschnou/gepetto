@@ -16,7 +16,42 @@ other task automation needs. It supports a wide variety of AI models and can lev
 - Supports MCP to connect to third party actions providers
 - Can run headless with cli-only on a server (Ubuntu)
 
-## 🤖Example of a Task Execution
+## 🤖 Use Cases
+
+Gepetto excels at automating tasks that require interacting with systems lacking API. This could be 
+browser based interaction, data collection from unstructured log files, processing emails, etc... Below
+is a list of use cases that I'm exploring in a development/operation context.
+
+- **QA Automation**: Execute 'manual' QA on web properties to ensure end-to-end flow are functional.
+- **Liveness check**: Periodically simulate real user behavior to ensure systems are live and working as expected.
+- **Data scraping**: Connect to web-only dashboard/tools to collect data and export it into machine-readable formats.
+- **Logs monitoring**: Process system logs to detect unusual behaviors.
+- **Report generation**: Collect, analyze, and summarize content from various dashboards into daily reports.
+
+## 📝 Example
+
+### Sample task
+
+Here is a simple task: performing a liveness/security check of the login/logout on a web property.
+
+```
+# Task Name
+description: "Website login/logout test."
+tags: [smoketest, qa]
+tools: [web, test]
+author: "Laurent"
+created: "2025-03-15"
+
+Test:
+  Visit ${HOSTNAME}.
+  Navigate to the login page.
+  Login with username ${USERNAME} and password ${PASSWORD}.
+  Verify user is logged in and on the main dashboard.
+  Click the logout button.
+  Verify you are back to the login page.
+```
+
+### Sample task result
 
 ```
 ===== TASK RESULT =====
@@ -91,24 +126,6 @@ gepetto init
 
 # Run a task file
 gepetto run gepetto/tasks/login.gpt
-```
-
-### Task File Format
-
-```
-# Task Name
-description: "Description of the task"
-tags: [tag1, tag2, tag3]
-author: "Author Name"
-created: "2025-03-15"
-
-Test:
-  Visit ${HOSTNAME}.
-  Navigate to the login page.
-  Login with username ${USERNAME} and password ${PASSWORD}.
-  Verify user is logged in and on the main dashboard.
-  Click the logout button.
-  Verify you are back to the login page.
 ```
 
 ### Variables
