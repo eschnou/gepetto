@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-**Gepetto** is a minimalistic cli-based Operator: an AI Agent that uses its own browser to perform tasks for you.
-The primary use case is running browser test cases, but it could be used for any other task automation needs. It
-supports a wide variety of AI models and can leverage any tools exposed through MCP.
+**Gepetto** is a minimalistic cli-based Operator: an AI Agent that uses its own browser (and any other tools) 
+to perform tasks for you. The primary use case is running browser test cases, but it could be used for any 
+other task automation needs. It supports a wide variety of AI models and can leverage any tools exposed through MCP.
 
 ## 🛠️️ Key Features
 
@@ -14,8 +14,9 @@ supports a wide variety of AI models and can leverage any tools exposed through 
 - Reporting task results in JUnit XML
 - Support a wide variety of LLM (gpt, claude, ollama, etc..)
 - Supports MCP to connect to third party actions providers
+- Can run headless with cli-only on a server (Ubuntu)
 
-## 🤖Example of a Test Execution
+## 🤖Example of a Task Execution
 
 ```
 ===== TASK RESULT =====
@@ -181,6 +182,13 @@ configuration at `src/main/resources/mcp-config.json` and then rebuild the appli
 ./mvnw clean package
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
+
+### Roadmap
+
+- Ensure everything can be configured without requiring a rebuild
+- Make it a single executable that be easily deployed
+- Add non-mcp tooling to support server side DevOps automation
+- You got ideas? File an issue!
 
 # Support
 - Join us on [Discord](https://discord.gg/3XPsmCRNE2)
