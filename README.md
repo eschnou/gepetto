@@ -68,7 +68,7 @@ Duration: 68753ms
 2. Navigate to the login page.
    Status: SUCCESS
    Details: The step to navigate to the login page was already completed successfully.
-3. Log in with username testuser2 and password trustno1.
+3. Log in with username johndoe and password secret.
    Status: SUCCESS
    Details: The login with username johndoe and password secret was successful, and the user was redirected to the dashboard.
 4. Verify that the dashboard page is displayed.
