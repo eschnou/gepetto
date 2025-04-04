@@ -102,10 +102,7 @@ npm install @playwright/mcp
 npx playwright install
 npx playwright install chrome
 
-# Run locally without installing
-./gepetto help
-
-# Or install to system (requires sudo)
+# Install to system (requires sudo)
 sudo ./install.sh
 ```
 
@@ -115,16 +112,18 @@ By default, Gepetto uses OpenAI gpt-4o as LLM. You therefore need an API key def
 either as en environment variable or in a .env file.
 
 ```bash
-# Export your Openai key (check documentation to use other providers)
-export OPENAI_API_KEY=sk-***
 
-# Alternate is to store it in a .env file
+# Create a new gepetto project or add gepetto to an existing one
+mkdir sample-project
+cd sample-project
+
+# Configure openai API key to use for this project
 echo OPENAI_API_KEY=sk-*** > .env
 
-# Initialize a new project
+# Initialize the project
 gepetto init
 
-# Run a task file
+# Run your first task
 gepetto run gepetto/tasks/login.gpt
 ```
 
