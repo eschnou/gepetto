@@ -213,7 +213,7 @@ cd gepetto
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
 
-# 💡 Roadmap
+## 💡 Roadmap
 
 - Ensure everything can be configured without requiring a rebuild
 - Make it a single executable that be easily deployed
