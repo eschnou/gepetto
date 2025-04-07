@@ -183,8 +183,8 @@ sessions if you'd like to clear the offline state.
 
 ### Running headless on a server
 
-If you want to run Gepetto on a server (without UI) in headless mode, you need to modify the MCP
-configuration at `src/main/resources/mcp-config.json` and then rebuild the application.
+If you want to run Gepetto on a server (without UI) in headless mode, you need to create a MCP
+configuration at `~/.gepetto/config/mcp-config.json` and then set the configuration path in application.properties.
 
 ```
 {

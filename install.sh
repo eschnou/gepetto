@@ -49,6 +49,29 @@ fi
 
 print_info "Java version ${JAVA_VERSION} found. Continuing installation..."
 
+# Check for Node.js and npm for Playwright support
+INSTALL_PLAYWRIGHT=false
+if command_exists npm; then
+  print_info "Node.js and npm found. Checking Playwright..."
+  
+  # Check if @playwright/mcp is installed globally
+  if ! npm list -g @playwright/mcp 2>/dev/null | grep -q "@playwright/mcp"; then
+    print_info "Playwright MCP not found. Would you like to install it? (y/n)"
+    read -r install_choice
+    if [[ "$install_choice" =~ ^[Yy]$ ]]; then
+      INSTALL_PLAYWRIGHT=true
+    fi
+  else
+    print_info "Playwright MCP already installed."
+  fi
+else
+  print_info "Node.js and npm not found. Playwright features will not be available."
+  print_info "To enable Playwright support, install Node.js and run:"
+  print_info "  npm install -g @playwright/mcp"
+  print_info "  npx playwright install"
+  print_info "  npx playwright install chrome"
+fi
+
 # Create directories if they don't exist
 mkdir -p "${INSTALL_DIR}" "${BIN_DIR}"
 
@@ -122,12 +145,26 @@ if [ ! -f "${PROPERTIES_FILE}" ]; then
 # spring.ai.openai.api-key=sk-***
 
 # MCP
-# spring.ai.mcp.client.stdio.servers-configuration=/path/to/mcp-config.json
+# spring.ai.mcp.client.stdio.servers-configuration=file:/path/to/mcp-config.json
 
 EOF
     chmod 600 "${PROPERTIES_FILE}"
     print_info "Default properties file created at ${PROPERTIES_FILE}"
     print_info "Please edit ${PROPERTIES_FILE} and set your OpenAI API key"
+fi
+
+# Install Playwright if requested
+if [ "$INSTALL_PLAYWRIGHT" = "true" ]; then
+  print_info "Installing Playwright MCP..."
+  npm install -g @playwright/mcp
+  
+  print_info "Installing Playwright browsers..."
+  npx playwright install
+  
+  print_info "Installing Chrome browser for Playwright..."
+  npx playwright install chrome
+  
+  print_info "Playwright installation complete."
 fi
 
 print_success "Gepetto has been installed successfully!"
