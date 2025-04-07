@@ -109,20 +109,6 @@ curl -s https://dist.gepetto.sh/releases/install.sh | bash
 
 Then you should edit `~/.gepetto/application.properties` and set your Open AI key. 
 
-### Build from sources
-
-```bash
-# Clone repository
-git clone https://github.com/eschnou/gepetto.git
-cd gepetto
-
-# Build executable JAR
-./mvnw clean package
-
-# Install to local user
-./install.sh
-```
-
 ## 🕹️Usage
 
 By default, Gepetto uses OpenAI gpt-4o as LLM. You therefore need an API key defined
@@ -201,6 +187,20 @@ configuration at `~/.gepetto/config/mcp-config.json` and then set the configurat
 ```
 
 ## 👷‍♂️Development
+
+### Build from sources
+
+```bash
+# Clone repository
+git clone https://github.com/eschnou/gepetto.git
+cd gepetto
+
+# Build executable JAR
+./mvnw clean package
+
+# Install to local user
+# ./install.sh
+```
 
 ### Running from Source
 
