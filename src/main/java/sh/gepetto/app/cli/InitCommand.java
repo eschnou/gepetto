@@ -30,7 +30,7 @@ public class InitCommand implements Runnable {
     private static final String TASKS_DIR = "tasks";
     private static final String RESULTS_DIR = "results";
     private static final String CONFIG_FILENAME = "config.yaml";
-    private static final String SAMPLE_TASK_FILENAME = "login.gpt";
+    private static final String SAMPLE_TASK_FILENAME = "hello.gpt";
     
     private final ApplicationConfig appConfig;
     private final ConfigurationService configService;

@@ -102,8 +102,8 @@ npm install @playwright/mcp
 npx playwright install
 npx playwright install chrome
 
-# Install to system (requires sudo)
-sudo ./install.sh
+# Install to local user
+./install.sh
 ```
 
 ## 🕹️Usage
@@ -117,14 +117,11 @@ either as en environment variable or in a .env file.
 mkdir sample-project
 cd sample-project
 
-# Configure openai API key to use for this project
-echo OPENAI_API_KEY=sk-*** > .env
-
 # Initialize the project
 gepetto init
 
 # Run your first task
-gepetto run gepetto/tasks/login.gpt
+gepetto run gepetto/tasks/hello.gpt
 ```
 
 ### Variables

@@ -30,9 +30,30 @@ public class GepettoApplication {
 	@Profile("!test")
 	public CommandLineRunner commandLineRunner(CommandLine.IFactory factory, GepettoCommand command) {
 		return args -> {
-			int exitCode = new CommandLine(command, factory).execute(args);
-			if (exitCode != 0) {
-				throw new CommandExecutionException(exitCode);
+			try {
+				CommandLine cmd = new CommandLine(command, factory);
+				cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+					// Handle picocli exceptions without a stack trace
+					System.err.println(ex.getMessage());
+					return commandLine.getCommandSpec().exitCodeOnExecutionException();
+				});
+				
+				// Silently handle parsing errors
+				cmd.setParameterExceptionHandler((ex, args1) -> {
+					System.err.println(ex.getMessage());
+					if (!CommandLine.UnmatchedArgumentException.printSuggestions(ex, System.err)) {
+						ex.getCommandLine().usage(System.err, ex.getCommandLine().getColorScheme());
+					}
+					return ex.getCommandLine().getCommandSpec().exitCodeOnInvalidInput();
+				});
+				
+				int exitCode = cmd.execute(args);
+				if (exitCode != 0) {
+					System.exit(exitCode);
+				}
+			} catch (Exception ex) {
+				// This should never happen with our error handlers
+				System.exit(1);
 			}
 		};
 	}
@@ -46,7 +67,13 @@ public class GepettoApplication {
 	public static class CommandExecutionException extends RuntimeException implements ExitCodeGenerator {
 		private final int exitCode;
 		
-		public CommandExecutionException(int exitCode) {
+		public CommandExecutionException(String message, int exitCode) {
+			super(message);
+			this.exitCode = exitCode;
+		}
+		
+		public CommandExecutionException(String message, Throwable cause, int exitCode) {
+			super(message, cause);
 			this.exitCode = exitCode;
 		}
 		

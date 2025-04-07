@@ -1,4 +1,4 @@
-name: Build and Deploy Native Executable
+name: Build and Deploy JAR
 
 on:
   release:
@@ -12,28 +12,19 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build and Deploy Native Executable
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            platform: linux
-          - os: macos-latest
-            platform: macos
+    name: Build and Deploy JAR
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
+          distribution: 'temurin'
+          cache: maven
 
       - name: Determine version
         id: version
@@ -47,39 +38,26 @@ jobs:
           fi
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo $VERSION > .version
 
       - name: Configure Maven settings
         run: |
           mkdir -p ~/.m2
           echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ secrets.GITHUB_TOKEN }}</password></server></servers></settings>" > ~/.m2/settings.xml
 
-      - name: Build native executable
-        run: ./mvnw -Pnative native:compile
+      - name: Build JAR
+        run: ./mvnw clean package -DskipTests
 
-      - name: Determine architecture
-        id: arch
+      - name: Prepare artifacts
         run: |
-          ARCH=$(uname -m)
-          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
-
-      - name: Create release package
-        run: |
-          ARTIFACT_NAME="gepetto"
-          ARTIFACT_FILE="${ARTIFACT_NAME}-${{ env.VERSION }}-${{ matrix.platform }}-${{ env.ARCH }}"
-          
-          # Copy executable with executable permissions
-          cp "target/${ARTIFACT_NAME}" "${ARTIFACT_FILE}"
-          chmod +x "${ARTIFACT_FILE}"
+          # Create version-specific JAR name
+          JAR_FILE="gepetto-${VERSION}.jar"
+          cp target/gepetto-*.jar "$JAR_FILE"
           
           # Create checksum
-          if [[ "${{ matrix.platform }}" == "linux" ]]; then
-            sha256sum "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
-          else
-            shasum -a 256 "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
-          fi
+          sha256sum "$JAR_FILE" > "$JAR_FILE.sha256"
           
-          echo "ARTIFACT_FILE=${ARTIFACT_FILE}" >> $GITHUB_ENV
+          echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -93,15 +71,25 @@ jobs:
           S3_BUCKET="${{ vars.S3_BUCKET }}"
           S3_KEY_PREFIX="${{ vars.S3_KEY_PREFIX || 'releases' }}"
           
-          # Upload artifact
-          aws s3 cp "${ARTIFACT_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}" --acl private
+          # Upload versioned JAR
+          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}" --acl public-read
           
-          # Upload checksum
-          aws s3 cp "${ARTIFACT_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}.sha256" --acl private
+          # Upload as latest
+          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar" --acl public-read
+          
+          # Upload checksums
+          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}.sha256" --acl public-read
+          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar.sha256" --acl public-read
+          
+          # Upload install script
+          aws s3 cp "install.sh" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/install.sh" --acl public-read
           
           echo "Uploaded to S3:"
-          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}"
-          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${ARTIFACT_FILE}.sha256"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}.sha256"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar.sha256"
+          echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/install.sh"
 
       - name: Upload artifacts to GitHub Release
         if: github.event_name == 'release'
@@ -110,9 +98,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_FILE }}
-          asset_name: ${{ env.ARTIFACT_FILE }}
-          asset_content_type: application/octet-stream
+          asset_path: ${{ env.JAR_FILE }}
+          asset_name: ${{ env.JAR_FILE }}
+          asset_content_type: application/java-archive
 
       - name: Upload checksum to GitHub Release
         if: github.event_name == 'release'
@@ -121,6 +109,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ARTIFACT_FILE }}.sha256
-          asset_name: ${{ env.ARTIFACT_FILE }}.sha256
+          asset_path: ${{ env.JAR_FILE }}.sha256
+          asset_name: ${{ env.JAR_FILE }}.sha256
+          asset_content_type: text/plain
+
+      - name: Upload install script to GitHub Release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: install.sh
+          asset_name: install.sh
           asset_content_type: text/plain
