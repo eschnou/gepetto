@@ -213,19 +213,19 @@ cd gepetto
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
 
-### Roadmap
+# 💡 Roadmap
 
 - Ensure everything can be configured without requiring a rebuild
 - Make it a single executable that be easily deployed
 - Add non-mcp tooling to support server side DevOps automation
 - You got ideas? File an issue!
 
-# Support
+## Support
 - Join us on [Discord](https://discord.gg/3XPsmCRNE2)
 - Reach out on [Bluesky](https://bsky.app/profile/eschnou.com)
 - File an [issue](https://github.com/eschnou/gepetto/issues)
 
-# License
+## License
 
 MIT License
 
