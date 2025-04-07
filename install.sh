@@ -57,6 +57,7 @@ if command_exists npm; then
   # Check if @playwright/mcp is installed globally
   if ! npm list -g @playwright/mcp 2>/dev/null | grep -q "@playwright/mcp"; then
     print_info "Playwright MCP not found. Would you like to install it? (y/n)"
+    printf "> "
     read -r install_choice
     if [[ "$install_choice" =~ ^[Yy]$ ]]; then
       INSTALL_PLAYWRIGHT=true
