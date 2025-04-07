@@ -116,17 +116,14 @@ if [ ! -f "${PROPERTIES_FILE}" ]; then
     cat > "${PROPERTIES_FILE}" << EOF
 # Gepetto application properties
 # This file overrides the default application settings
+# Check Gepetto, OpenGPA and Spring AI configuration for more settings.
 
 # API Keys
-spring.ai.openai.api-key=sk-***
+# spring.ai.openai.api-key=sk-***
 
 # MCP
 # spring.ai.mcp.client.stdio.servers-configuration=/path/to/mcp-config.json
 
-# Logging
-logging.level.root=off
-logging.level.org.springframework=off
-logging.level.sh.gepetto=error
 EOF
     chmod 600 "${PROPERTIES_FILE}"
     print_info "Default properties file created at ${PROPERTIES_FILE}"
