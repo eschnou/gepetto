@@ -56,12 +56,6 @@ public class OpengPGATaskOperator implements TaskOperator {
     public TaskRun plan(TaskDetails task) {
         Map<String, String> taskContext = new HashMap<>();
         taskContext.put("task", task.getName());
-        
-        // Add hostname if defined
-        String hostname = applicationConfig.getVariable("HOSTNAME");
-        if (hostname != null) {
-            taskContext.put("hostname", hostname);
-        }
 
         ReActAgent agent = new ReActAgent(chatModel, workspace, actions, task.getDescription(), taskContext);
         if (StringUtils.hasText(applicationConfig.getConfiguration().getLogPath())) {

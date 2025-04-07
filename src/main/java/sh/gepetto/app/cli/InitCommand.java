@@ -110,8 +110,8 @@ public class InitCommand implements Runnable {
             }
         } else {
             configContent.append("  # Example variables:\n");
-            configContent.append("  # HOSTNAME: \"example.com\"\n");
-            configContent.append("  # USERNAME: \"user@example.com\"\n");
+            configContent.append("  HOSTNAME: \"https://weather.gov\"\n");
+            configContent.append("  LOCATION: \"New York, NY, USA\"\n");
         }
         
         configContent.append("debug: false\n");
@@ -125,17 +125,15 @@ public class InitCommand implements Runnable {
         String currentDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
         StringBuilder taskContent = new StringBuilder();
-        taskContent.append("# Sample Login Task\n");
-        taskContent.append("description: \"Log in to the application with valid credentials\"\n");
-        taskContent.append("tags: [login, authentication]\n");
+        taskContent.append("# Sample Task\n");
+        taskContent.append("description: \"Check weather for a US city\"\n");
+        taskContent.append("tags: [smoketest]\n");
         taskContent.append("author: \"Gepetto\"\n");
         taskContent.append("created: \"").append(currentDate).append("\"\n\n");
         taskContent.append("Task:\n");
-        taskContent.append("  Navigate to ${HOSTNAME}/login.\n");
-        taskContent.append("  Log in with username ${USERNAME} and password ${PASSWORD}.\n");
-        taskContent.append("  Verify that the dashboard page is displayed.\n");
-        taskContent.append("  Logout from the application.\n");
-        taskContent.append("  Verify that you are back to the login screen.\n");
+        taskContent.append("  Navigate to ${HOSTNAME} and verify you are at the weather service.\n");
+        taskContent.append("  Search the weather for ${LOCATION}.\n");
+        taskContent.append("  Verify that the weather matches the requested location.\n");
 
         Files.writeString(taskPath, taskContent.toString());
     }
