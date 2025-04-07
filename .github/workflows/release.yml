@@ -72,17 +72,17 @@ jobs:
           S3_KEY_PREFIX="${{ vars.S3_KEY_PREFIX || 'releases' }}"
           
           # Upload versioned JAR
-          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}" --acl public-read
+          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}"
           
           # Upload as latest
-          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar" --acl public-read
+          aws s3 cp "${JAR_FILE}" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar"
           
           # Upload checksums
-          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}.sha256" --acl public-read
-          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar.sha256" --acl public-read
+          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}.sha256"
+          aws s3 cp "${JAR_FILE}.sha256" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/gepetto-latest.jar.sha256"
           
           # Upload install script
-          aws s3 cp "install.sh" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/install.sh" --acl public-read
+          aws s3 cp "install.sh" "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/install.sh"
           
           echo "Uploaded to S3:"
           echo "s3://${S3_BUCKET}/${S3_KEY_PREFIX}/${JAR_FILE}"
