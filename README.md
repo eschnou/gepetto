@@ -87,7 +87,29 @@ Test report saved to: gepetto/results/login/20250401_072929/junit-report.xml
 
 ```
 
-## 🏗️ Installation
+## 🏗️ Install
+
+### Pre-requisite
+
+- You need a Java 21 or above
+- You need to install Playwright MCP if you want to control a browser
+
+```bash
+# Install Playwright MCP
+npm install @playwright/mcp
+npx playwright install
+npx playwright install chrome
+```
+
+### Quick oneliner install
+
+```bash
+curl -s https://dist.gepetto.sh/releases/install.sh | bash
+```
+
+Then you should edit `~/.gepetto/application.properties` and set your Open AI key. 
+
+### Build from sources
 
 ```bash
 # Clone repository
@@ -96,11 +118,6 @@ cd gepetto
 
 # Build executable JAR
 ./mvnw clean package
-
-# Install Playwright MCP
-npm install @playwright/mcp
-npx playwright install
-npx playwright install chrome
 
 # Install to local user
 ./install.sh
