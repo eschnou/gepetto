@@ -1,4 +1,4 @@
-# Gepetto - A minimalistic cli-based Operator
+# Gepetto - A cli-based Operator for QA/DevOps tasks
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
