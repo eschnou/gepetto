@@ -1,6 +1,7 @@
 package sh.gepetto.app.cli;
 
 import sh.gepetto.app.config.ApplicationConfig;
+import sh.gepetto.app.config.Constants;
 import sh.gepetto.app.service.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +27,7 @@ import java.time.format.DateTimeFormatter;
 public class InitCommand implements Runnable {
     
     private static final Logger logger = LoggerFactory.getLogger(InitCommand.class);
-    private static final String PROJECT_DIR = "gepetto";
-    private static final String TASKS_DIR = "tasks";
-    private static final String RESULTS_DIR = "results";
-    private static final String CONFIG_FILENAME = "config.yaml";
-    private static final String SAMPLE_TASK_FILENAME = "hello.gpt";
-    
+
     private final ApplicationConfig appConfig;
     private final ConfigurationService configService;
     
@@ -46,9 +42,9 @@ public class InitCommand implements Runnable {
     @Override
     public void run() {
         // Check if already initialized
-        Path projectDir = Paths.get(PROJECT_DIR);
+        Path projectDir = Paths.get(Constants.PROJECT_DIR);
         if (Files.exists(projectDir)) {
-            System.out.println("Project already initialized. Directory exists at " + PROJECT_DIR);
+            System.out.println("Project already initialized. Directory exists at " + Constants.PROJECT_DIR);
             System.out.println("Use 'configure' command to update existing configuration.");
             return;
         }
@@ -63,10 +59,10 @@ public class InitCommand implements Runnable {
             createConfigFile();
             createSampleTask();
             System.out.println("Gepetto project initialized successfully!");
-            System.out.println("- Project structure created at " + PROJECT_DIR + "/");
-            System.out.println("- Configuration saved to " + PROJECT_DIR + "/" + CONFIG_FILENAME);
-            System.out.println("- Sample task created at " + PROJECT_DIR + "/" + TASKS_DIR + "/" + SAMPLE_TASK_FILENAME);
-            System.out.println("\nTo run your task: gepetto run " + PROJECT_DIR + "/" + TASKS_DIR + "/" + SAMPLE_TASK_FILENAME);
+            System.out.println("- Project structure created at " + Constants.PROJECT_DIR + "/");
+            System.out.println("- Configuration saved to " + Constants.PROJECT_DIR + "/" + Constants.CONFIG_FILENAME);
+            System.out.println("- Sample task created at " + Constants.PROJECT_DIR + "/" + Constants.TASKS_DIR + "/" + Constants.SAMPLE_TASK_FILENAME);
+            System.out.println("\nTo run your task: gepetto run " + Constants.PROJECT_DIR + "/" + Constants.TASKS_DIR + "/" + Constants.SAMPLE_TASK_FILENAME);
         } catch (IOException e) {
             logger.error("Error initializing project: {}", e.getMessage(), e);
             System.err.println("Error initializing project: " + e.getMessage());
@@ -75,21 +71,21 @@ public class InitCommand implements Runnable {
     
     private void createProjectStructure() throws IOException {
         // Create main project directory
-        Path projectDir = Paths.get(PROJECT_DIR);
+        Path projectDir = Paths.get(Constants.PROJECT_DIR);
         if (!Files.exists(projectDir)) {
             logger.info("Creating project directory: {}", projectDir);
             Files.createDirectories(projectDir);
         }
         
         // Create tasks directory
-        Path tasksDir = Paths.get(PROJECT_DIR, TASKS_DIR);
+        Path tasksDir = Paths.get(Constants.PROJECT_DIR, Constants.TASKS_DIR);
         if (!Files.exists(tasksDir)) {
             logger.info("Creating tasks directory: {}", tasksDir);
             Files.createDirectories(tasksDir);
         }
         
         // Create results directory
-        Path resultsDir = Paths.get(PROJECT_DIR, RESULTS_DIR);
+        Path resultsDir = Paths.get(Constants.PROJECT_DIR, Constants.RESULTS_DIR);
         if (!Files.exists(resultsDir)) {
             logger.info("Creating results directory: {}", resultsDir);
             Files.createDirectories(resultsDir);
@@ -97,7 +93,7 @@ public class InitCommand implements Runnable {
     }
     
     private void createConfigFile() throws IOException {
-        Path configPath = Paths.get(PROJECT_DIR, CONFIG_FILENAME);
+        Path configPath = Paths.get(Constants.PROJECT_DIR, Constants.CONFIG_FILENAME);
         
         StringBuilder configContent = new StringBuilder();
         configContent.append("# Gepetto Configuration\n\n");
@@ -121,7 +117,7 @@ public class InitCommand implements Runnable {
     }
     
     private void createSampleTask() throws IOException {
-        Path taskPath = Paths.get(PROJECT_DIR, TASKS_DIR, SAMPLE_TASK_FILENAME);
+        Path taskPath = Paths.get(Constants.PROJECT_DIR, Constants.TASKS_DIR, Constants.SAMPLE_TASK_FILENAME);
         String currentDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
         StringBuilder taskContent = new StringBuilder();

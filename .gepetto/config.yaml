@@ -1,0 +1,8 @@
+# Gepetto Configuration
+
+variables:
+  # Example variables:
+  HOSTNAME: "https://weather.gov"
+  LOCATION: "New York, NY, USA"
+debug: false
+timeout: 30000

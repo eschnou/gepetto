@@ -1,6 +1,5 @@
 package sh.gepetto.app;
 
-import org.opengpa.core.config.EnableOpenGPA;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +17,6 @@ import picocli.CommandLine;
  * to write and execute tasks in plain English.
  */
 @SpringBootApplication
-@EnableOpenGPA
 public class GepettoApplication {
 
 	public static void main(String[] args) {

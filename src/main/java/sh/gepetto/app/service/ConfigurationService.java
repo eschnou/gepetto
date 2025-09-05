@@ -1,5 +1,6 @@
 package sh.gepetto.app.service;
 
+import sh.gepetto.app.config.Constants;
 import sh.gepetto.app.model.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -19,8 +20,6 @@ import java.nio.file.Paths;
 public class ConfigurationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
-    private static final String PROJECT_DIR = "gepetto";
-    private static final String CONFIG_FILE = "config.yaml";
 
     private final ObjectMapper yamlMapper;
     private Path configFilePath;
@@ -36,7 +35,7 @@ public class ConfigurationService {
      * @return true if configuration file exists, false otherwise
      */
     public boolean configurationExists() {
-        Path configPath = Paths.get(PROJECT_DIR, CONFIG_FILE);
+        Path configPath = Paths.get(Constants.PROJECT_DIR, Constants.CONFIG_FILE);
         if (Files.exists(configPath)) {
             configFilePath = configPath;
             return true;
@@ -87,7 +86,7 @@ public class ConfigurationService {
      * Get the configuration file path
      */
     private Path getConfigFilePath() {
-        return Paths.get(PROJECT_DIR, CONFIG_FILE);
+        return Paths.get(Constants.PROJECT_DIR, Constants.CONFIG_FILE);
     }
 
     /**

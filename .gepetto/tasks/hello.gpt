@@ -1,0 +1,10 @@
+# Sample Task
+description: "Check weather for a US city"
+tags: [smoketest]
+author: "Gepetto"
+created: "2025-09-05"
+
+Task:
+  Navigate to ${HOSTNAME} and verify you are at the weather service.
+  Search the weather for ${LOCATION}.
+  Verify that the weather matches the requested location.

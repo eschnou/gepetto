@@ -1,5 +1,6 @@
 package sh.gepetto.app.service;
 
+import org.springframework.scheduling.config.Task;
 import sh.gepetto.app.model.Configuration;
 import sh.gepetto.app.model.TaskDetails;
 import sh.gepetto.app.model.StepResult;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Service responsible for executing tasks
@@ -46,12 +48,15 @@ public class TaskExecutionService {
         try {
             // Validate all variables up front before executing steps
             validateAllRequiredVariables(configuration, task);
-            
-            // Here we would normally implement the actual task execution logic
-            // For now, we'll just set up a placeholder that creates a positive result
 
-            // Placeholder for processing task steps
-            processTaskSteps(configuration, task, result);
+            // Processing task steps
+            TaskRun taskRun = TaskRun.builder()
+                    .id(UUID.randomUUID().toString())
+                    .task(task)
+                    .result(result)
+                    .build();
+
+            processTaskSteps(configuration, taskRun);
 
             // If all steps passed, mark the task as passed
             result.setStatus(TaskResult.Status.SUCCESS);
@@ -82,13 +87,14 @@ public class TaskExecutionService {
     /**
      * Process each step in the task and add results to the task result
      */
-    private void processTaskSteps(Configuration configuration, TaskDetails task, TaskResult result) {
+    private void processTaskSteps(Configuration configuration, TaskRun taskRun) {
         // First, plan the task run with the TaskOperator
+        TaskDetails task = taskRun.getTask();
+        TaskResult result = taskRun.getResult();
         System.out.println("\n===== STARTING TASK: " + task.getName() + " =====");
         System.out.println("Description: " + task.getDescription());
         System.out.println("Total steps: " + task.getSteps().size());
-        
-        TaskRun taskRun = taskOperator.plan(task);
+
         logger.info("Task run planned with ID: {}", taskRun.getId());
         
         // Process each step in the task

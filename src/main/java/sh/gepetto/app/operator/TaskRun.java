@@ -2,6 +2,8 @@ package sh.gepetto.app.operator;
 
 import lombok.Builder;
 import lombok.Data;
+import sh.gepetto.app.model.TaskDetails;
+import sh.gepetto.app.model.TaskResult;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -10,24 +12,11 @@ import java.util.Map;
 @Builder
 public class TaskRun {
 
-  public enum Status {
-    SUCCESS,
-    FAILURE
-  }
-
-  private ZonedDateTime created;
-
-  private ZonedDateTime completed;
-
   private String id;
 
-  private String title;
+  private TaskDetails task;
 
-  private String description;
-
-  private Map<String, String> context;
-
-  private Status status;
+  private TaskResult result;
 
 }
 

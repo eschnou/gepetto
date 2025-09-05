@@ -7,9 +7,3 @@ Only execute the step requested by the user, don't overdo it.
 
 To finalize the test, you MUST complete the test by calling the complete_test action detailing
 the result of the test and what happened.
-
-The test is happening in this context:
-{context}
-
-You have access to the following list of actions:
-{actions}

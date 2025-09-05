@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="hello" tasks="3" failures="0" errors="0" skipped="0" hostname="gepetto" time="26.125" timestamp="2025-09-05T11:45:45">
+  <properties>
+    <property name="testName" value="hello"/>
+    <property name="testDescription" value="Check weather for a US city"/>
+  </properties>
+  <testcase name="Navigate to https://weather.gov and verify you are at the weather service." classname="sh.gepetto.task">
+  </testcase>
+  <testcase name="Search the weather for New York, NY, USA." classname="sh.gepetto.task">
+  </testcase>
+  <testcase name="Verify that the weather matches the requested location." classname="sh.gepetto.task">
+  </testcase>
+</testsuite>

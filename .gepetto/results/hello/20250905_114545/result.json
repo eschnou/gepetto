@@ -1,0 +1,21 @@
+{
+  "testName": "hello",
+  "testDescription": "Check weather for a US city",
+  "status": "SUCCESS",
+  "executionTime": "2025-09-05T11:45:45",
+  "executionDurationMs": 26125,
+  "stepResults": [
+    {
+      "step": "Navigate to https://weather.gov and verify you are at the weather service.",
+      "status": "SUCCESS"
+    },
+    {
+      "step": "Search the weather for New York, NY, USA.",
+      "status": "SUCCESS"
+    },
+    {
+      "step": "Verify that the weather matches the requested location.",
+      "status": "SUCCESS"
+    }
+  ]
+}

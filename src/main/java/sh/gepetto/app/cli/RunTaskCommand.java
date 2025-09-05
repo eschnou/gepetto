@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 
 import sh.gepetto.app.config.ApplicationConfig;
+import sh.gepetto.app.config.Constants;
 import sh.gepetto.app.model.StepResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import sh.gepetto.app.service.TaskParser;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import static sh.gepetto.app.config.Constants.*;
 /**
  * Command for running tasks
  */
@@ -48,8 +50,8 @@ public class RunTaskCommand implements Runnable {
     @Option(names = {"--no-report"}, description = "Disable saving test reports")
     private boolean noReport;
     
-    @picocli.CommandLine.Parameters(index = "0", description = "Path to the task file to run (.test or .gpt)")
-    private String taskFilePath;
+    @picocli.CommandLine.Parameters(index = "0", description = "Name to the task to run")
+    private String taskName;
     
     public RunTaskCommand(
             TaskParser taskParser,
@@ -91,15 +93,15 @@ public class RunTaskCommand implements Runnable {
             logger.info("Using variables: {}", config.getVariables());
 
             // Parse task file
-            Path path = Paths.get(taskFilePath);
+            Path path = Paths.get(PROJECT_DIR, TASKS_DIR, taskName + ".gpt");
             if (!Files.exists(path)) {
-                System.out.println("Error: Task file not found: " + taskFilePath);
+                System.out.println("Error: Task  not found: " + path);
                 return;
             }
             
             // Validate file extension
             if (!taskParser.isValidTaskFile(path)) {
-                System.out.println("Error: Invalid file type. File must have .test or .gpt extension: " + taskFilePath);
+                System.out.println("Error: Invalid file type. File must have .test or .gpt extension: " + taskName);
                 return;
             }
 

@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 
+import static sh.gepetto.app.config.Constants.*;
+
 /**
  * Service for generating JUnit XML reports from Gepetto test results
  */
@@ -33,7 +35,7 @@ public class JUnitReportService {
         String timestamp = result.getExecutionTime().format(TIMESTAMP_FORMATTER);
         String taskName = sanitizeFileName(result.getTask().getName());
         
-        Path resultsDir = Path.of("gepetto", "results", taskName, timestamp);
+        Path resultsDir = Path.of(PROJECT_DIR, RESULTS_DIR, taskName, timestamp);
         Files.createDirectories(resultsDir);
         
         // Create the XML report
