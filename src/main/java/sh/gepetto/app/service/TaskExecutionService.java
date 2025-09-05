@@ -100,8 +100,8 @@ public class TaskExecutionService {
         // Process each step in the task
         for (int i = 0; i < task.getSteps().size(); i++) {
             String step = task.getSteps().get(i);
-            System.out.println("\n===== STEP " + (i + 1) + "/" + task.getSteps().size() + " =====");
-            
+            System.out.println("\n===== STEP " + (i + 1) + "/" + task.getSteps().size() + " " + step + "=====");
+
             // Replace variables in the step
             // We've already validated all variables exist, so this should not fail
             String processedStep = replaceVariables(configuration, step);
@@ -122,7 +122,7 @@ public class TaskExecutionService {
                 System.out.println("\n❌ Step " + (i + 1) + " failed with status: " + stepResult.getStatus());
                 break;
             } else {
-                System.out.println("\n✅ Step " + (i + 1) + " completed successfully");
+                System.out.println("\n✅ Step " + (i + 1) + " passed: " + stepResult.getDetails());
             }
         }
         

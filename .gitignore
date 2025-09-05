@@ -39,6 +39,7 @@ build/
 src/main/resources/application-local.properties
 
 ### Gepetto ###
+.gepetto/
 logs/
 application-local.properties
 

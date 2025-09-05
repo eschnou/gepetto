@@ -16,7 +16,7 @@ public class ControlTools {
     public record CompleteActionResult(String message, TaskResult.Status status) {
     }
 
-    @Tool(description = "Complete the test with either success, failure or error and a message describing what happened", returnDirect = true)
+    @Tool(description = "Complete the test with either success, failure or error and a message describing what happened", returnDirect = true, name = "complete_test")
     public CompleteActionResult completeAction(
             @ToolParam(description = "A descriptive message for the test result.") String message,
             @ToolParam(description = "The result of the test") TaskResult.Status status, ToolContext toolContext) throws IOException
