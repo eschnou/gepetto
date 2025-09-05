@@ -1,4 +1,4 @@
-# Gepetto - A minimalistic cli-based Operator
+# Gepetto - A cli-based Operator for QA/DevOps tasks
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -109,20 +109,6 @@ curl -s https://dist.gepetto.sh/releases/install.sh | bash
 
 Then you should edit `~/.gepetto/application.properties` and set your Open AI key. 
 
-### Build from sources
-
-```bash
-# Clone repository
-git clone https://github.com/eschnou/gepetto.git
-cd gepetto
-
-# Build executable JAR
-./mvnw clean package
-
-# Install to local user
-./install.sh
-```
-
 ## 🕹️Usage
 
 By default, Gepetto uses OpenAI gpt-4o as LLM. You therefore need an API key defined
@@ -202,6 +188,20 @@ configuration at `~/.gepetto/config/mcp-config.json` and then set the configurat
 
 ## 👷‍♂️Development
 
+### Build from sources
+
+```bash
+# Clone repository
+git clone https://github.com/eschnou/gepetto.git
+cd gepetto
+
+# Build executable JAR
+./mvnw clean package
+
+# Install to local user
+# ./install.sh
+```
+
 ### Running from Source
 
 ```bash
@@ -213,19 +213,19 @@ configuration at `~/.gepetto/config/mcp-config.json` and then set the configurat
 java -jar target/gepetto-0.0.1-SNAPSHOT.jar help
 ```
 
-### Roadmap
+## 💡 Roadmap
 
 - Ensure everything can be configured without requiring a rebuild
 - Make it a single executable that be easily deployed
 - Add non-mcp tooling to support server side DevOps automation
 - You got ideas? File an issue!
 
-# Support
+## Support
 - Join us on [Discord](https://discord.gg/3XPsmCRNE2)
 - Reach out on [Bluesky](https://bsky.app/profile/eschnou.com)
 - File an [issue](https://github.com/eschnou/gepetto/issues)
 
-# License
+## License
 
 MIT License
 
